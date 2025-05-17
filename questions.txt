@@ -1,13 +1,69 @@
-Q: Which of the following is not a function of the skeleton?
-A: Support
-B: Protection
-C: Circulation
-D: Movement
-ANS: C
+Question 1: Which of the following is NOT a reason why plants need support?
+A: To maintain their shape and structure
+B: To allow leaves to reach sunlight
+C: To store excess water
+D: To prevent collapse under their own weight
+Correct: C
 
-Q: What type of joint is found at the elbow?
-A: Ball and socket
-B: Hinge
-C: Pivot
-D: Gliding
-ANS: B
+Question 2: Why do plants need to move?
+A: To escape from predators
+B: To respond to environmental stimuli like light and gravity
+C: To change location for better soil
+D: To conserve energy
+Correct: B
+
+Question 3: Which plant structure is most critical for support against gravity?
+A: Leaves
+B: Roots
+C: Stems
+D: Flowers
+Correct: C
+
+Question 4: The necessity for movement in plants is primarily to:
+A: Find food
+B: Respond to light for photosynthesis
+C: Escape unfavorable conditions
+D: Increase reproduction rate
+Correct: B
+
+Question 5: Which of the following is a direct benefit of plant support systems?
+A: Enhanced respiration
+B: Improved water absorption
+C: Upright growth for sunlight capture
+D: Increased seed dispersal
+Correct: C
+
+Question 6: Which tissue provides flexible support in young herbaceous plants?
+A: Xylem
+B: Phloem
+C: Collenchyma
+D: Parenchyma
+Correct: C
+
+Question 7: In older plants, support is primarily provided by:
+A: Turgidity of cells
+B: Lignified xylem vessels
+C: Phloem fibers
+D: Epidermal cells
+Correct: B
+
+Question 8: Which tissue in plants is responsible for conducting water and providing support?
+A: Phloem
+B: Parenchyma
+C: Collenchyma
+D: Xylem
+Correct: D
+
+Question 9: The primary function of sclerenchyma tissue is:
+A: Flexible support
+B: Rigid support
+C: Water conduction
+D: Food storage
+Correct: B
+
+Question 10: Which of the following tissues is dead at maturity and provides support?
+A: Collenchyma
+B: Sclerenchyma
+C: Parenchyma
+D: Phloem
+Correct: B
