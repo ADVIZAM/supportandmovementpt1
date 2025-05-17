@@ -19,6 +19,17 @@
             text-align: center;
             color: #2c3e50;
         }
+        .instructions {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            text-align: center;
+            color: #34495e;
+            font-size: 16px;
+            line-height: 1.5;
+        }
         .student-info, .quiz-container {
             background: #ffffff;
             padding: 20px;
@@ -101,11 +112,11 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-        #startBtn, #submitBtn, #emailBtn {
+        #startBtn, #submitBtn {
             background: #3498db;
             color: white;
         }
-        #startBtn:hover, #submitBtn:hover, #emailBtn:hover {
+        #startBtn:hover, #submitBtn:hover {
             background: #2980b9;
         }
         #printBtn {
@@ -136,7 +147,7 @@
             50% { background: #e74c3c; }
             100% { background: #3498db; }
         }
-        #printBtn, #emailBtn {
+        #printBtn {
             display: none;
         }
         @media print {
@@ -149,40 +160,17 @@
                 border: 1px solid #000;
             }
         }
-        .email-content {
-            font-family: Arial, sans-serif;
-            color: #333;
-        }
-        .email-content h1 {
-            color: #2c3e50;
-            text-align: center;
-        }
-        .email-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-        }
-        .email-content th, .email-content td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-        .email-content th {
-            background: #f5f6fa;
-        }
-        .email-content .correct {
-            background: #27ae60;
-            color: white;
-        }
-        .email-content .incorrect {
-            background: #e74c3c;
-            color: white;
-        }
     </style>
 </head>
 <body>
     <div id="pdfContent">
         <h1>Support and Movement in Plants and Animals Quiz (Form 4, Part 1)</h1>
+        <div class="instructions">
+            Answer all questions within the time limit.<br>
+            Click submit when done.<br>
+            Print the answers.<br>
+            Send the PDF to email ngathosec9@gmail.com.
+        </div>
         <div class="student-info">
             <label>Surname: <input type="text" id="surname" oninput="this.value = this.value.toUpperCase()" required></label>
             <label>First Name: <input type="text" id="firstName" oninput="this.value = this.value.toUpperCase()" required></label>
@@ -220,7 +208,6 @@
                 <div id="score" style="display: none;"></div>
                 <button type="button" id="submitBtn" onclick="submitQuiz()">Submit</button>
                 <button type="button" id="printBtn" onclick="handlePrint()">Print</button>
-                <button type="button" id="emailBtn" onclick="sendEmail()">Send to Email</button>
             </form>
         </div>
     </div>
@@ -383,7 +370,6 @@
             const score = document.getElementById('score');
             const submitBtn = document.getElementById('submitBtn');
             const printBtn = document.getElementById('printBtn');
-            const emailBtn = document.getElementById('emailBtn');
 
             quizForm.innerHTML = '';
             questions.forEach((q, i) => {
@@ -421,11 +407,9 @@
             score.style.display = readOnly ? 'block' : 'none';
             submitBtn.style.display = readOnly ? 'none' : 'inline-block';
             printBtn.style.display = readOnly ? 'inline-block' : 'none';
-            emailBtn.style.display = readOnly ? 'inline-block' : 'none';
             quizForm.appendChild(score);
             quizForm.appendChild(submitBtn);
             quizForm.appendChild(printBtn);
-            quizForm.appendChild(emailBtn);
 
             if (!readOnly) {
                 attachCheckboxListeners();
@@ -571,11 +555,11 @@
             if (lockoutData) {
                 const { timestamp } = JSON.parse(lockoutData);
                 const now = Date.now();
-                const twentyFourHours = 24 * 60 * 60 * 1000;
-                if (now - timestamp < twentyFourHours) {
-                    const remainingMs = twentyFourHours - (now - timestamp);
-                    const remainingHours = Math.ceil(remainingMs / (60 * 60 * 1000));
-                    errorMsg.textContent = `Your IP is locked out. Try again in ${remainingHours} hour(s).`;
+                const tenMinutes = 10 * 60 * 1000;
+                if (now - timestamp < tenMinutes) {
+                    const remainingMs = tenMinutes - (now - timestamp);
+                    const remainingMinutes = Math.ceil(remainingMs / (60 * 1000));
+                    errorMsg.textContent = `Your IP is locked out. Try again in ${remainingMinutes} minute(s).`;
                     errorMsg.style.display = 'block';
                     return { canStart: false, hasSubmitted: false };
                 } else {
@@ -639,7 +623,7 @@
 
             quizData.studentInfo = { surname, firstName, otherName: document.getElementById('otherName').value.trim(), admNo, form, stream };
 
-            errorMsg.style.display = 'block'; // Keep error message visible for prior submissions
+            errorMsg.style.display = submissionStatus.hasSubmitted ? 'block' : 'none';
             document.getElementById('quizContainer').style.display = 'block';
             document.getElementById('startBtn').disabled = true;
 
@@ -682,7 +666,6 @@
             const submitBtn = document.getElementById('submitBtn');
             const scoreDiv = document.getElementById('score');
             const printBtn = document.getElementById('printBtn');
-            const emailBtn = document.getElementById('emailBtn');
 
             updateUnansweredQuestions();
 
@@ -716,7 +699,6 @@
                 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = true);
                 submitBtn.disabled = true;
                 printBtn.style.display = 'inline-block';
-                emailBtn.style.display = 'inline-block';
                 clearInterval(timerInterval);
                 document.getElementById('timer').style.display = 'none';
 
@@ -732,93 +714,12 @@
 
                     // Store IP lockout if timer expired
                     if (isAutoSubmit) {
-                        const lockoutKey = `lockout_${quizData.ipAddress}_part1`;
+                        const lockoutKey = `lockout_${ipAddress}_part1`;
                         localStorage.setItem(lockoutKey, JSON.stringify({
                             timestamp: Date.now()
                         }));
                     }
                 }
-            }
-        }
-
-        // Send email with PDF
-        function sendEmail() {
-            const errorMsg = document.getElementById('errorMsg');
-            if (!quizData.studentInfo || !quizData.answers || !quizData.score) {
-                errorMsg.textContent = 'Please submit the quiz before sending the email.';
-                errorMsg.style.display = 'block';
-                return;
-            }
-
-            const element = document.getElementById('pdfContent');
-            const opt = {
-                margin: 10,
-                filename: `Quiz_${quizData.studentInfo?.surname || 'Student'}_${quizData.studentInfo?.firstName || 'Unknown'}_${quizData.studentInfo?.admNo || 'NoAdmNo'}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save().catch(err => {
-                console.error('Error generating PDF:', err);
-                errorMsg.textContent = 'Error generating PDF. Please try again.';
-                errorMsg.style.display = 'block';
-                return;
-            });
-
-            let htmlContent = `
-                <div class="email-content" style="font-family: Arial, sans-serif; color: #333;">
-                    <h1 style="color: #2c3e50; text-align: center;">Support and Movement in Plants and Animals Quiz (Form 4, Part 1)</h1>
-                    <p>Please attach the downloaded PDF (${opt.filename}) to this email.</p>
-                    <h2 style="color: #34495e;">Student Information</h2>
-                    <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
-                        <tr><th style="border: 1px solid #ccc; padding: 8px; background: #f5f6fa;">Field</th><th style="border: 1px solid #ccc; padding: 8px; background: #f5f6fa;">Details</th></tr>
-                        <tr><td style="border: 1px solid #ccc; padding: 8px;">Surname</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.surname}</td></tr>
-                        <tr><td style="border: 1px solid #ccc; padding: 8px;">First Name</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.firstName}</td></tr>
-                        <tr><td style="border: 1px solid #ccc; padding: 8px;">Other Name</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.otherName || 'N/A'}</td></tr>
-                        <tr><td style="border: 1px solid #ccc; padding: 8px;">Admission Number</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.admNo}</td></tr>
-                        <tr><td style="border: 1px solid #ccc; padding: 8px;">Form</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.form}</td></tr>
-                        <tr><td style="border: 1px solid #ccc; padding: 8px;">Stream</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.stream}</td></tr>
-                    </table>
-                    ${quizData.photoBase64 ? `<img src="${quizData.photoBase64}" alt="Student Photo" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #3498db; border-radius: 5px; margin: 10px 0;" />` : '<p style="color: #e74c3c;">Photo not available</p>'}
-                    <h2 style="color: #34495e;">Quiz Answers</h2>
-            `;
-
-            quizData.answers.forEach((answer, index) => {
-                const statusClass = answer.isCorrect ? 'correct' : answer.selectedAnswer === 'Not answered' ? '' : 'incorrect';
-                const statusStyle = answer.isCorrect ? 'background: #27ae60; color: white;' : answer.selectedAnswer === 'Not answered' ? '' : 'background: #e74c3c; color: white;';
-                htmlContent += `
-                    <div style="margin-bottom: 20px; padding: 15px; background: #f5f6fa; border-radius: 8px;">
-                        <p style="font-weight: bold; color: #2c3e50; margin-bottom: 10px;">${answer.questionText}</p>
-                        <ul style="list-style: none; padding: 0;">
-                            ${answer.options.map(option => `<li style="margin: 8px 0;">${option}</li>`).join('')}
-                        </ul>
-                        <p style="margin: 10px 0; padding: 10px; border-radius: 5px; ${statusStyle}" class="${statusClass}">Selected Answer: ${answer.selectedAnswer}</p>
-                    </div>
-                `;
-            });
-
-            htmlContent += `
-                    <h2 style="color: #34495e; text-align: center;">Score: ${quizData.score}</h2>
-                </div>
-            `;
-
-            const subject = encodeURIComponent(`Quiz Submission - ${quizData.studentInfo.surname} ${quizData.studentInfo.firstName}`);
-            const body = encodeURIComponent(htmlContent);
-            const mailtoLink = `mailto:ngathosec9@gmail.com?subject=${subject}&body=${body}`;
-
-            if (mailtoLink.length > 2000) {
-                errorMsg.textContent = 'Email content is too large for mailto link. Please use print option or reduce photo size.';
-                errorMsg.style.display = 'block';
-                return;
-            }
-
-            try {
-                window.location.href = mailtoLink;
-            } catch (err) {
-                console.error('Error opening mailto link:', err);
-                errorMsg.textContent = 'Error opening email client. Please try again or use print option.';
-                errorMsg.style.display = 'block';
             }
         }
     </script>
