@@ -1,82 +1,603 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Support and Movement Biology Quiz</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support and Movement in Plants and Animals Quiz (Form 4, Part 1)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 20px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #e6f0fa;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .student-info, .quiz-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .student-info label {
+            display: block;
+            margin: 10px 0;
+            font-weight: bold;
+            color: #34495e;
+        }
+        .student-info input, .student-info select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #photoPreview {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f5f6fa;
+            border-radius: 8px;
+        }
+        .question p {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .options label {
+            display: block;
+            margin: 8px 0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .options input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .correct {
+            background: #27ae60 !important;
+            color: white;
+        }
+        .incorrect {
+            background: #e74c3c !important;
+            color: white;
+        }
+        .error, #timer {
+            color: #e74c3c;
+            font-weight: bold;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .highlight {
+            border: 2px solid #e74c3c;
+            animation: highlight 3s forwards;
+        }
+        @keyframes highlight {
+            0% { border-color: #e74c3c; }
+            100% { border-color: transparent; }
+        }
+        button {
+            padding: 12px 25px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #startBtn, #submitBtn, #emailBtn {
+            background: #3498db;
+            color: white;
+        }
+        #startBtn:hover, #submitBtn:hover, #emailBtn:hover {
+            background: #2980b9;
+        }
+        #printBtn {
+            background: #8e44ad;
+            color: white;
+        }
+        #printBtn:hover {
+            background: #7d3c98;
+        }
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        #score {
+            text-align: center;
+            font-size: 18px;
+            color: #27ae60;
+            margin: 20px 0;
+        }
+        #pdfContent {
+            display: block;
+        }
+        .submit-highlight {
+            animation: submitHighlight 2s infinite;
+        }
+        @keyframes submitHighlight {
+            0% { background: #3498db; }
+            50% { background: #e74c3c; }
+            100% { background: #3498db; }
+        }
+        @media print {
+            button, #timer, .error {
+                display: none !important;
+            }
+            .correct, .incorrect {
+                background: none;
+                color: #000;
+                border: 1px solid #000;
+            }
+        }
+        .email-content {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .email-content h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .email-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .email-content th, .email-content td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        .email-content th {
+            background: #f5f6fa;
+        }
+        .email-content .correct {
+            background: #27ae60;
+            color: white;
+        }
+        .email-content .incorrect {
+            background: #e74c3c;
+            color: white;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center p-6">
-
-  <h1 class="text-3xl font-bold mb-6 text-center">Support and Movement Biology Quiz</h1>
-
-  <!-- Entry Form -->
-  <form id="entry-form" class="w-full max-w-lg bg-white p-6 rounded shadow mb-6">
-    <h2 class="text-xl font-semibold mb-4">Enter Your Details</h2>
-
-    <label class="block mb-2">
-      <span class="font-semibold">Surname:</span>
-      <input type="text" id="surname" required class="input-field" />
-    </label>
-
-    <label class="block mb-2">
-      <span class="font-semibold">First Name:</span>
-      <input type="text" id="firstname" required class="input-field" />
-    </label>
-
-    <label class="block mb-2">
-      <span class="font-semibold">Other Name:</span>
-      <input type="text" id="othername" class="input-field" />
-    </label>
-
-    <label class="block mb-4">
-      <span class="font-semibold">Passport Photo (Max 2MB, JPG/PNG):</span>
-      <input type="file" id="photo" accept=".jpg,.jpeg,.png" />
-      <img id="preview" class="mt-2 hidden w-32 h-32 object-cover rounded border" alt="Photo Preview" />
-    </label>
-
-    <label class="block mb-2">
-      <span class="font-semibold">Admission Number (1-9999):</span>
-      <input type="number" id="admission" min="1" max="9999" required class="input-field" />
-    </label>
-
-    <label class="block mb-2">
-      <span class="font-semibold">Form:</span>
-      <select id="form" required class="input-field">
-        <option value="" disabled selected>Select Form</option>
-        <option>Form 1</option>
-        <option>Form 2</option>
-        <option>Form 3</option>
-        <option>Form 4</option>
-      </select>
-    </label>
-
-    <label class="block mb-4">
-      <span class="font-semibold">Stream:</span>
-      <select id="stream" required class="input-field">
-        <option value="" disabled selected>Select Stream</option>
-        <option>K</option>
-        <option>L</option>
-        <option>Q</option>
-      </select>
-    </label>
-
-    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 w-full font-semibold">Start Quiz</button>
-  </form>
-
-  <!-- Quiz Section -->
-  <section id="quiz-section" class="w-full max-w-4xl bg-white p-6 rounded shadow hidden">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-semibold">Quiz</h2>
-      <div>
-        Time Remaining: <span id="timer" class="font-mono text-lg">00:00</span>
-      </div>
+<body>
+    <div id="pdfContent">
+        <h1>Support and Movement in Plants and Animals Quiz (Form 4, Part 1)</h1>
+        <div class="student-info">
+            <label>Surname: <input type="text" id="surname" oninput="this.value = this.value.toUpperCase()" required></label>
+            <label>First Name: <input type="text" id="firstName" oninput="this.value = this.value.toUpperCase()" required></label>
+            <label>Other Name: <input type="text" id="otherName" oninput="this.value = this.value.toUpperCase()"></label>
+            <label>Passport Photo (Max 2MB, JPG/PNG):
+                <input type="file" id="photo" accept="image/jpeg,image/png" required>
+                <img id="photoPreview" alt="Photo Preview">
+            </label>
+            <label>Admission Number (1-9999):
+                <input type="number" id="admNo" min="1" max="9999" required>
+            </label>
+            <label>Form:
+                <select id="form" required>
+                    <option value="">Select Form</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </label>
+            <label>Stream:
+                <select id="stream" required>
+                    <option value="">Select Stream</option>
+                    <option value="K">K</option>
+                    <option value="L">L</option>
+                    <option value="Q">Q</option>
+                </select>
+            </label>
+            <button type="button" id="startBtn" onclick="startQuiz()">Start Quiz</button>
+        </div>
+        <div id="errorMsg" class="error"></div>
+        <div id="timer" style="display: none;">Time Remaining: 21:00</div>
+        <div class="quiz-container" id="quizContainer" style="display: none;">
+            <form id="quizForm">
+                <div id="score" style="display: none;"></div>
+                <button type="button" id="submitBtn" onclick="submitQuiz()">Submit</button>
+                <button type="button" id="printBtn" onclick="window.print()">Print</button>
+                <button type="button" id="emailBtn" onclick="sendEmail()" style="display: none;">Send to Email</button>
+            </form>
+        </div>
     </div>
-    
-    <div id="quiz-container" class="space-y-4"></div>
-  </section>
 
-  <script src="script.js"></script>
+    <script>
+        let timerInterval;
+        let timeLeft = 21 * 60; // 21 minutes in seconds
+        let unansweredQuestions = [];
+        let quizData = {}; // Store quiz data for email
+        let questions = []; // Store parsed questions
+
+        // Load questions from questions.txt
+        async function loadQuestions() {
+            try {
+                const response = await fetch('questions.txt');
+                if (!response.ok) throw new Error('Failed to load questions.txt');
+                const text = await response.text();
+                parseQuestions(text);
+                renderQuestions();
+            } catch (err) {
+                console.error('Error loading questions:', err);
+                document.getElementById('errorMsg').textContent = 'Error loading questions. Please ensure questions.txt is present.';
+                document.getElementById('errorMsg').style.display = 'block';
+                return false;
+            }
+            return true;
+        }
+
+        // Parse questions from text
+        function parseQuestions(text) {
+            questions = [];
+            const questionBlocks = text.trim().split('\n\n');
+            questionBlocks.forEach((block, index) => {
+                const lines = block.split('\n');
+                if (lines.length >= 6) {
+                    const questionText = lines[0].replace(/^Question \d+: /, '');
+                    const options = {
+                        A: lines[1].replace(/^A: /, ''),
+                        B: lines[2].replace(/^B: /, ''),
+                        C: lines[3].replace(/^C: /, ''),
+                        D: lines[4].replace(/^D: /, '')
+                    };
+                    const correct = lines[5].replace(/^Correct: /, '');
+                    questions.push({ index: index + 1, text: questionText, options, correct });
+                }
+            });
+        }
+
+        // Render questions in the form
+        function renderQuestions() {
+            const quizForm = document.getElementById('quizForm');
+            const submitBtn = document.getElementById('submitBtn');
+            quizForm.innerHTML = ''; // Clear existing content
+            questions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'question';
+                div.innerHTML = `
+                    <p>${q.index}. ${q.text}</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q${q.index}" value="A" ${q.correct === 'A' ? 'data-correct="true"' : ''}> A. ${q.options.A}</label>
+                        <label><input type="checkbox" name="q${q.index}" value="B" ${q.correct === 'B' ? 'data-correct="true"' : ''}> B. ${q.options.B}</label>
+                        <label><input type="checkbox" name="q${q.index}" value="C" ${q.correct === 'C' ? 'data-correct="true"' : ''}> C. ${q.options.C}</label>
+                        <label><input type="checkbox" name="q${q.index}" value="D" ${q.correct === 'D' ? 'data-correct="true"' : ''}> D. ${q.options.D}</label>
+                    </div>
+                `;
+                quizForm.appendChild(div);
+            });
+            // Re-append buttons
+            quizForm.appendChild(document.getElementById('score'));
+            quizForm.appendChild(submitBtn);
+            quizForm.appendChild(document.getElementById('printBtn'));
+            quizForm.appendChild(document.getElementById('emailBtn'));
+            // Re-attach checkbox event listeners
+            attachCheckboxListeners();
+        }
+
+        // Attach event listeners to checkboxes
+        function attachCheckboxListeners() {
+            document.querySelectorAll('.question').forEach((question, index) => {
+                const checkboxes = question.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', () => {
+                        if (checkbox.checked) {
+                            // Uncheck other checkboxes in the same question
+                            checkboxes.forEach(cb => {
+                                if (cb !== checkbox) {
+                                    cb.checked = false;
+                                    cb.parentElement.classList.remove('correct', 'incorrect');
+                                }
+                            });
+                            // Disable other checkboxes and apply styling
+                            checkboxes.forEach(cb => {
+                                cb.disabled = true;
+                                const label = cb.parentElement;
+                                label.classList.remove('correct', 'incorrect');
+                                if (cb.checked) {
+                                    if (cb.dataset.correct === 'true') {
+                                        label.classList.add('correct');
+                                    } else {
+                                        label.classList.add('incorrect');
+                                    }
+                                }
+                            });
+                            updateUnansweredQuestions();
+                        } else {
+                            // Re-enable all checkboxes if unchecked
+                            checkboxes.forEach(cb => {
+                                cb.disabled = false;
+                                cb.parentElement.classList.remove('correct', 'incorrect');
+                            });
+                            updateUnansweredQuestions();
+                        }
+                    });
+                });
+            });
+        }
+
+        // Handle photo upload and preview
+        document.getElementById('photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const errorMsg = document.getElementById('errorMsg');
+            const preview = document.getElementById('photoPreview');
+
+            errorMsg.textContent = '';
+            errorMsg.style.display = 'none';
+            preview.style.display = 'none';
+
+            if (!file) return;
+
+            const validTypes = ['image/jpeg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                errorMsg.textContent = 'Please upload a JPG or PNG image.';
+                errorMsg.style.display = 'block';
+                this.value = '';
+                return;
+            }
+
+            if (file.size > 2 * 1024 * 1024) {
+                errorMsg.textContent = 'Photo must be 2MB or less.';
+                errorMsg.style.display = 'block';
+                this.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    quizData.photoBase64 = e.target.result;
+                } catch (err) {
+                    console.error('Error displaying photo preview:', err);
+                    errorMsg.textContent = 'Error displaying photo. Please try another image.';
+                    errorMsg.style.display = 'block';
+                    this.value = '';
+                }
+            };
+            reader.onerror = function(err) {
+                console.error('Error reading file:', err);
+                errorMsg.textContent = 'Error reading photo. Please try another image.';
+                errorMsg.style.display = 'block';
+                this.value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Update unanswered questions
+        function updateUnansweredQuestions() {
+            unansweredQuestions = [];
+            document.querySelectorAll('.question').forEach((question, index) => {
+                const checked = question.querySelector(`input[name="q${index + 1}"]:checked`);
+                if (!checked) {
+                    unansweredQuestions.push({ index, element: question });
+                }
+            });
+
+            const errorMsg = document.getElementById('errorMsg');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (unansweredQuestions.length > 0) {
+                const nextUnanswered = unansweredQuestions[0].element;
+                errorMsg.textContent = `Please answer all questions. ${unansweredQuestions.length} question(s) unanswered.`;
+                errorMsg.style.display = 'block';
+                nextUnanswered.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                nextUnanswered.classList.add('highlight');
+                setTimeout(() => nextUnanswered.classList.remove('highlight'), 3000);
+            } else {
+                errorMsg.style.display = 'none';
+                submitBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                submitBtn.classList.add('submit-highlight');
+                setTimeout(() => submitBtn.classList.remove('submit-highlight'), 6000);
+            }
+        }
+
+        // Check submission lockout
+        function canSubmit() {
+            const admNo = document.getElementById('admNo').value.trim();
+            if (!admNo) return true;
+            const lastSubmission = localStorage.getItem(`lastSubmission_${admNo}_part1`);
+            if (!lastSubmission) return true;
+            const now = Date.now();
+            const tenMinutes = 10 * 60 * 1000;
+            return now - parseInt(lastSubmission) > tenMinutes;
+        }
+
+        // Start the quiz
+        async function startQuiz() {
+            const surname = document.getElementById('surname').value.trim();
+            const firstName = document.getElementById('firstName').value.trim();
+            const photo = document.getElementById('photo').files[0];
+            const admNo = document.getElementById('admNo').value.trim();
+            const form = document.getElementById('form').value;
+            const stream = document.getElementById('stream').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const preview = document.getElementById('photoPreview');
+
+            if (!surname || !firstName || !photo || !admNo || !form || !stream) {
+                errorMsg.textContent = 'Please fill all required fields and upload a photo.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (admNo < 1 || admNo > 9999) {
+                errorMsg.textContent = 'Admission number must be between 1 and 9999.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            const validTypes = ['image/jpeg', 'image/png'];
+            if (!validTypes.includes(photo.type)) {
+                errorMsg.textContent = 'Please upload a JPG or PNG image.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (photo.size > 2 * 1024 * 1024) {
+                errorMsg.textContent = 'Photo must be 2MB or less.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (!preview.src || preview.style.display === 'none') {
+                errorMsg.textContent = 'Photo preview not loaded. Please re-upload the photo.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (!canSubmit()) {
+                errorMsg.textContent = 'You must wait 10 minutes before retaking the quiz.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // Load questions before starting the quiz
+            const questionsLoaded = await loadQuestions();
+            if (!questionsLoaded || questions.length === 0) {
+                errorMsg.textContent = 'No questions loaded. Please check questions.txt.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            quizData.studentInfo = { surname, firstName, otherName: document.getElementById('otherName').value.trim(), admNo, form, stream };
+
+            errorMsg.style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('timer').style.display = 'block';
+            document.getElementById('startBtn').disabled = true;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('timer').textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitQuiz(true);
+                }
+            }, 1000);
+        }
+
+        // Handle quiz submission
+        function submitQuiz(isAutoSubmit = false) {
+            const errorMsg = document.getElementById('errorMsg');
+            const submitBtn = document.getElementById('submitBtn');
+            const scoreDiv = document.getElementById('score');
+            const emailBtn = document.getElementById('emailBtn');
+
+            updateUnansweredQuestions();
+
+            if (isAutoSubmit || unansweredQuestions.length === 0) {
+                let score = 0;
+                quizData.answers = [];
+                questions.forEach((q, i) => {
+                    const question = document.querySelector(`.question:nth-child(${i + 1})`);
+                    const questionText = question.queryStaffElement('p').textContent;
+                    const checked = document.querySelector(`input[name="q${q.index}"]:checked`);
+                    const options = Object.values(q.options);
+                    let selectedAnswer = checked ? checked.parentElement.textContent : 'Not answered';
+                    let isCorrect = checked && checked.dataset.correct === 'true';
+                    if (isCorrect) score++;
+                    quizData.answers.push({ questionText, options, selectedAnswer, isCorrect });
+                });
+
+                quizData.score = `${score}/${questions.length} (${((score / questions.length) * 100).toFixed(2)}%)`;
+
+                scoreDiv.textContent = `Your Score: ${quizData.score}`;
+                scoreDiv.style.display = 'block';
+
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = true);
+                submitBtn.disabled = true;
+                emailBtn.style.display = 'inline-block';
+                clearInterval(timerInterval);
+                document.getElementById('timer').style.display = 'none';
+
+                const admNo = document.getElementById('admNo').value.trim();
+                if (admNo) {
+                    localStorage.setItem(`lastSubmission_${admNo}_part1`, Date.now());
+                }
+            }
+        }
+
+        // Send email
+        function sendEmail() {
+            const errorMsg = document.getElementById('errorMsg');
+            if (!quizData.studentInfo || !quizData.answers || !quizData.score) {
+                errorMsg.textContent = 'Please submit the quiz before sending the email.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            let htmlContent = `
+                <div class="email-content" style="font-family: Arial, sans-serif; color: #333;">
+                    <h1 style="color: #2c3e50; text-align: center;">Support and Movement in Plants and Animals Quiz (Form 4, Part 1)</h1>
+                    <h2 style="color: #34495e;">Student Information</h2>
+                    <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                        <tr><th style="border: 1px solid #ccc; padding: 8px; background: #f5f6fa;">Field</th><th style="border: 1px solid #ccc; padding: 8px; background: #f5f6fa;">Details</th></tr>
+                        <tr><td style="border: 1px solid #ccc; padding: 8px;">Surname</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.surname}</td></tr>
+                        <tr><td style="border: 1px solid #ccc; padding: 8px;">First Name</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.firstName}</td></tr>
+                        <tr><td style="border: 1px solid #ccc; padding: 8px;">Other Name</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.otherName || 'N/A'}</td></tr>
+                        <tr><td style="border: 1px solid #ccc; padding: 8px;">Admission Number</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.admNo}</td></tr>
+                        <tr><td style="border: 1px solid #ccc; padding: 8px;">Form</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.form}</td></tr>
+                        <tr><td style="border: 1px solid #ccc; padding: 8px;">Stream</td><td style="border: 1px solid #ccc; padding: 8px;">${quizData.studentInfo.stream}</td></tr>
+                    </table>
+                    ${quizData.photoBase64 ? `<img src="${quizData.photoBase64}" alt="Student Photo" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #3498db; border-radius: 5px; margin: 10px 0;" />` : '<p style="color: #e74c3c;">Photo not available</p>'}
+                    <h2 style="color: #34495e;">Quiz Answers</h2>
+            `;
+
+            quizData.answers.forEach((answer, index) => {
+                const statusClass = answer.isCorrect ? 'correct' : answer.selectedAnswer === 'Not answered' ? '' : 'incorrect';
+                const statusStyle = answer.isCorrect ? 'background: #27ae60; color: white;' : answer.selectedAnswer === 'Not answered' ? '' : 'background: #e74c3c; color: white;';
+                htmlContent += `
+                    <div style="margin-bottom: 20px; padding: 15px; background: #f5f6fa; border-radius: 8px;">
+                        <p style="font-weight: bold; color: #2c3e50; margin-bottom: 10px;">${answer.questionText}</p>
+                        <ul style="list-style: none; padding: 0;">
+                            ${answer.options.map(option => `<li style="margin: 8px 0;">${option}</li>`).join('')}
+                        </ul>
+                        <p style="margin: 10px 0; padding: 10px; border-radius: 5px; ${statusStyle}" class="${statusClass}">Selected Answer: ${answer.selectedAnswer}</p>
+                    </div>
+                `;
+            });
+
+            htmlContent += `
+                    <h2 style="color: #34495e; text-align: center;">Score: ${quizData.score}</h2>
+                </div>
+            `;
+
+            const subject = encodeURIComponent(`Quiz Submission - ${quizData.studentInfo.surname} ${quizData.studentInfo.firstName}`);
+            const body = encodeURIComponent(htmlContent);
+            const mailtoLink = `mailto:ngathosec9@gmail.com?subject=${subject}&body=${body}`;
+
+            if (mailtoLink.length > 2000) {
+                errorMsg.textContent = 'Email content is too large for mailto link. Please use print option or reduce photo size.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            try {
+                window.location.href = mailtoLink;
+            } catch (err) {
+                console.error('Error opening mailto link:', err);
+                errorMsg.textContent = 'Error opening email client. Please try again or use print option.';
+                errorMsg.style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
