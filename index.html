@@ -217,31 +217,459 @@
         let timeLeft; // Set dynamically in startQuiz
         let unansweredQuestions = [];
         let quizData = {}; // Store quiz data
-        let questions = [
-            {
-                index: 1,
-                text: "What is the primary function of the xylem tissue in plants?",
-                options: {
-                    A: "Transport of water and minerals",
-                    B: "Transport of food",
-                    C: "Support and strength",
-                    D: "Photosynthesis"
-                },
-                correct: "A"
-            },
-            {
-                index: 2,
-                text: "Which structure in vertebrates provides flexibility and support to the spinal column?",
-                options: {
-                    A: "Ribs",
-                    B: "Vertebrae",
-                    C: "Cartilage",
-                    D: "Ligaments"
-                },
-                correct: "B"
-            }
-        ];
-
+       let questions = [
+    {
+        index: 1,
+        text: "What is the primary purpose of support structures in plants?",
+        options: {
+            A: "To store nutrients",
+            B: "To maintain upright growth for light capture",
+            C: "To transport water",
+            D: "To protect against predators"
+        },
+        correct: "B"
+    },
+    {
+        index: 2,
+        text: "Why do plants exhibit movement?",
+        options: {
+            A: "To relocate to nutrient-rich soil",
+            B: "To respond to stimuli like light and touch",
+            C: "To avoid herbivory",
+            D: "To conserve water"
+        },
+        correct: "B"
+    },
+    {
+        index: 3,
+        text: "Which plant organ is most responsible for structural support against gravity?",
+        options: {
+            A: "Roots",
+            B: "Leaves",
+            C: "Stems",
+            D: "Flowers"
+        },
+        correct: "C"
+    },
+    {
+        index: 4,
+        text: "What is a key reason for plant movement?",
+        options: {
+            A: "To enhance seed dispersal",
+            B: "To optimize photosynthesis by tracking light",
+            C: "To store energy",
+            D: "To increase root growth"
+        },
+        correct: "B"
+    },
+    {
+        index: 5,
+        text: "How do support systems benefit herbaceous plants?",
+        options: {
+            A: "They improve nutrient absorption",
+            B: "They allow upright posture for sunlight",
+            C: "They enhance respiration",
+            D: "They protect against wind"
+        },
+        correct: "B"
+    },
+    {
+        index: 6,
+        text: "Which tissue provides flexible support in young plant stems?",
+        options: {
+            A: "Xylem",
+            B: "Collenchyma",
+            C: "Phloem",
+            D: "Sclerenchyma"
+        },
+        correct: "B"
+    },
+    {
+        index: 7,
+        text: "In mature woody plants, support is mainly provided by:",
+        options: {
+            A: "Turgid parenchyma",
+            B: "Lignified xylem",
+            C: "Phloem fibers",
+            D: "Collenchyma"
+        },
+        correct: "B"
+    },
+    {
+        index: 8,
+        text: "Which plant tissue conducts water and contributes to support?",
+        options: {
+            A: "Phloem",
+            B: "Xylem",
+            C: "Parenchyma",
+            D: "Epidermis"
+        },
+        correct: "B"
+    },
+    {
+        index: 9,
+        text: "What is the main role of sclerenchyma in plants?",
+        options: {
+            A: "Water storage",
+            B: "Rigid support",
+            C: "Flexible support",
+            D: "Nutrient transport"
+        },
+        correct: "B"
+    },
+    {
+        index: 10,
+        text: "Which tissue is dead at maturity and provides structural support?",
+        options: {
+            A: "Collenchyma",
+            B: "Sclerenchyma",
+            C: "Parenchyma",
+            D: "Phloem"
+        },
+        correct: "B"
+    },
+    {
+        index: 11,
+        text: "In young herbaceous stems, which tissue ensures flexibility?",
+        options: {
+            A: "Xylem",
+            B: "Sclerenchyma",
+            C: "Collenchyma",
+            D: "Phloem"
+        },
+        correct: "C"
+    },
+    {
+        index: 12,
+        text: "Which is NOT a feature of collenchyma cells?",
+        options: {
+            A: "Unevenly thickened walls",
+            B: "Found in young stems",
+            C: "Provides flexibility",
+            D: "Contains lignin"
+        },
+        correct: "D"
+    },
+    {
+        index: 13,
+        text: "How do collenchyma and sclerenchyma differ?",
+        options: {
+            A: "Collenchyma is dead; sclerenchyma is alive",
+            B: "Collenchyma is rigid; sclerenchyma is flexible",
+            C: "Collenchyma has uneven walls; sclerenchyma has uniform walls",
+            D: "Collenchyma is in roots; sclerenchyma is in stems"
+        },
+        correct: "C"
+    },
+    {
+        index: 14,
+        text: "Which tissue gives nutshells their hardness?",
+        options: {
+            A: "Parenchyma",
+            B: "Collenchyma",
+            C: "Sclerenchyma",
+            D: "Xylem"
+        },
+        correct: "C"
+    },
+    {
+        index: 15,
+        text: "In dicot vascular bundles, which tissue provides support?",
+        options: {
+            A: "Epidermis",
+            B: "Parenchyma",
+            C: "Sclerenchyma",
+            D: "Collenchyma"
+        },
+        correct: "C"
+    },
+    {
+        index: 16,
+        text: "What primarily supports herbaceous plants?",
+        options: {
+            A: "Lignified xylem",
+            B: "Turgor pressure",
+            C: "Sclerenchyma fibers",
+            D: "Bark"
+        },
+        correct: "B"
+    },
+    {
+        index: 17,
+        text: "In woody plants, which tissue is the main support?",
+        options: {
+            A: "Phloem",
+            B: "Xylem",
+            C: "Collenchyma",
+            D: "Parenchyma"
+        },
+        correct: "B"
+    },
+    {
+        index: 18,
+        text: "Which is NOT a characteristic of woody stems?",
+        options: {
+            A: "Lignified xylem",
+            B: "Thick bark",
+            C: "Flexible collenchyma",
+            D: "Hardened cell walls"
+        },
+        correct: "C"
+    },
+    {
+        index: 19,
+        text: "What enables trees to stand upright?",
+        options: {
+            A: "Phloem fibers",
+            B: "Lignin in xylem",
+            C: "Turgid leaf cells",
+            D: "Root pressure"
+        },
+        correct: "B"
+    },
+    {
+        index: 20,
+        text: "Which part of a tree trunk offers the most support?",
+        options: {
+            A: "Outer bark",
+            B: "Heartwood (old xylem)",
+            C: "Inner bark",
+            D: "Sapwood"
+        },
+        correct: "B"
+    },
+    {
+        index: 21,
+        text: "Which plant movement responds to light?",
+        options: {
+            A: "Thigmotropism",
+            B: "Phototropism",
+            C: "Geotropism",
+            D: "Nastic movement"
+        },
+        correct: "B"
+    },
+    {
+        index: 22,
+        text: "Root growth toward gravity is an example of:",
+        options: {
+            A: "Negative phototropism",
+            B: "Positive geotropism",
+            C: "Positive phototropism",
+            D: "Negative geotropism"
+        },
+        correct: "B"
+    },
+    {
+        index: 23,
+        text: "Thigmotropism responds to:",
+        options: {
+            A: "Gravity",
+            B: "Touch",
+            C: "Light",
+            D: "Water"
+        },
+        correct: "B"
+    },
+    {
+        index: 24,
+        text: "The Venus flytrap closing is an example of:",
+        options: {
+            A: "Hydrotropism",
+            B: "Thigmotropism",
+            C: "Phototropism",
+            D: "Geotropism"
+        },
+        correct: "B"
+    },
+    {
+        index: 25,
+        text: "Which is NOT a tropism?",
+        options: {
+            A: "Thigmotropism",
+            B: "Nastic movement",
+            C: "Phototropism",
+            D: "Geotropism"
+        },
+        correct: "B"
+    },
+    {
+        index: 26,
+        text: "Plant movement away from gravity is called:",
+        options: {
+            A: "Positive geotropism",
+            B: "Negative geotropism",
+            C: "Negative phototropism",
+            D: "Positive phototropism"
+        },
+        correct: "B"
+    },
+    {
+        index: 27,
+        text: "Which is an example of nastic movement?",
+        options: {
+            A: "Roots growing toward water",
+            B: "Mimosa leaves closing when touched",
+            C: "Shoots bending toward light",
+            D: "Tendrils wrapping around supports"
+        },
+        correct: "B"
+    },
+    {
+        index: 28,
+        text: "How do tropisms differ from nastic movements?",
+        options: {
+            A: "Tropisms are non-directional; nastic movements are directional",
+            B: "Tropisms are directional; nastic movements are non-directional",
+            C: "Tropisms are fast; nastic movements are slow",
+            D: "Tropisms occur in leaves; nastic movements in stems"
+        },
+        correct: "B"
+    },
+    {
+        index: 29,
+        text: "What characterizes nastic movements?",
+        options: {
+            A: "Direction depends on stimulus",
+            B: "Direction is independent of stimulus",
+            C: "Only responds to light",
+            D: "Involves slow growth"
+        },
+        correct: "B"
+    },
+    {
+        index: 30,
+        text: "Tendrils wrapping around a support is an example of:",
+        options: {
+            A: "Thigmotropism",
+            B: "Phototropism",
+            C: "Hydrotropism",
+            D: "Geotropism"
+        },
+        correct: "A"
+    },
+    {
+        index: 31,
+        text: "Which tissue supports plants via turgidity?",
+        options: {
+            A: "Sclerenchyma",
+            B: "Parenchyma",
+            C: "Xylem",
+            D: "Collenchyma"
+        },
+        correct: "B"
+    },
+    {
+        index: 32,
+        text: "What is the primary role of lignin in xylem?",
+        options: {
+            A: "Water conduction",
+            B: "Rigid support",
+            C: "Nutrient storage",
+            D: "Sugar transport"
+        },
+        correct: "B"
+    },
+    {
+        index: 33,
+        text: "Which tissue is NOT involved in plant support?",
+        options: {
+            A: "Xylem",
+            B: "Phloem",
+            C: "Sclerenchyma",
+            D: "Collenchyma"
+        },
+        correct: "B"
+    },
+    {
+        index: 34,
+        text: "In monocots, support is mainly provided by:",
+        options: {
+            A: "Collenchyma",
+            B: "Lignified xylem",
+            C: "Parenchyma",
+            D: "Phloem"
+        },
+        correct: "B"
+    },
+    {
+        index: 35,
+        text: "Which plant movement is non-directional?",
+        options: {
+            A: "Thigmotropism",
+            B: "Nastic movement",
+            C: "Geotropism",
+            D: "Phototropism"
+        },
+        correct: "B"
+    },
+    {
+        index: 36,
+        text: "Shoots growing toward light is an example of:",
+        options: {
+            A: "Negative phototropism",
+            B: "Positive phototropism",
+            C: "Nastic movement",
+            D: "Thigmotropism"
+        },
+        correct: "B"
+    },
+    {
+        index: 37,
+        text: "How do collenchyma and parenchyma differ?",
+        options: {
+            A: "Collenchyma is dead; parenchyma is alive",
+            B: "Collenchyma supports; parenchyma stores",
+            C: "Parenchyma is rigid; collenchyma is flexible",
+            D: "Both are lignified"
+        },
+        correct: "B"
+    },
+    {
+        index: 38,
+        text: "Which tissue in young stem cortex provides support?",
+        options: {
+            A: "Sclerenchyma",
+            B: "Collenchyma",
+            C: "Xylem",
+            D: "Phloem"
+        },
+        correct: "B"
+    },
+    {
+        index: 39,
+        text: "What is the role of turgidity in herbaceous plants?",
+        options: {
+            A: "Nutrient storage",
+            B: "Flexible support",
+            C: "Water conduction",
+            D: "Sugar transport"
+        },
+        correct: "B"
+    },
+    {
+        index: 40,
+        text: "Which is NOT involved in plant support?",
+        options: {
+            A: "Cellulose",
+            B: "Chlorophyll",
+            C: "Lignin",
+            D: "Turgor pressure"
+        },
+        correct: "B"
+    },
+    {
+        index: 41,
+        text: "The main support tissue in a mature tree stem is:",
+        options: {
+            A: "Collenchyma",
+            B: "Xylem",
+            C: "Phloem",
+            D: "Parenchyma"
+        },
+        correct: "B"
+    }
+];
         // Fetch IP address
         async function getIPAddress() {
             try {
