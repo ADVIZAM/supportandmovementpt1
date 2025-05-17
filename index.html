@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support and Movement in Plants and Animals Quiz (Form 4, Part 1)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 20px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #e6f0fa;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .student-info, .quiz-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .student-info label {
+            display: block;
+            margin: 10px 0;
+            font-weight: bold;
+            color: #34495e;
+        }
+        .student-info input, .student-info select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #photoPreview {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f5f6fa;
+            border-radius: 8px;
+        }
+        .question p {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .options label {
+            display: block;
+            margin: 8px 0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .options input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .correct {
+            background: #27ae60 !important;
+            color: white;
+        }
+        .incorrect {
+            background: #e74c3c !important;
+            color: white;
+        }
+        .error, #timer {
+            color: #e74c3c;
+            font-weight: bold;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .highlight {
+            border: 2px solid #e74c3c;
+            animation: highlight 3s forwards;
+        }
+        @keyframes highlight {
+            0% { border-color: #e74c3c; }
+            100% { border-color: transparent; }
+        }
+        button {
+            padding: 12px 25px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #startBtn, #submitBtn {
+            background: #3498db;
+            color: white;
+        }
+        #startBtn:hover, #submitBtn:hover {
+            background: #2980b9;
+        }
+        #printBtn {
+            background: #8e44ad;
+            color: white;
+        }
+        #printBtn:hover {
+            background: #7d3c98;
+        }
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        #score {
+            text-align: center;
+            font-size: 18px;
+            color: #27ae60;
+            margin: 20px 0;
+        }
+        #pdfContent {
+            display: block;
+        }
+        .submit-highlight {
+            animation: submitHighlight 2s infinite;
+        }
+        @keyframes submitHighlight {
+            0% { background: #3498db; }
+            50% { background: #e74c3c; }
+            100% { background: #3498db; }
+        }
+        @media print {
+            button, #timer, .error {
+                display: none !important;
+            }
+            .correct, .incorrect {
+                background: none;
+                color: #000;
+                border: 1px solid #000;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="pdfContent">
+        <h1>Support and Movement in Plants and Animals Quiz (Form 4, Part 1)</h1>
+        <div class="student-info">
+            <label>Surname: <input type="text" id="surname" oninput="this.value = this.value.toUpperCase()" required></label>
+            <label>First Name: <input type="text" id="firstName" oninput="this.value = this.value.toUpperCase()" required></label>
+            <label>Other Name: <input type="text" id="otherName" oninput="this.value = this.value.toUpperCase()"></label>
+            <label>Passport Photo (Max 2MB, JPG/PNG):
+                <input type="file" id="photo" accept="image/jpeg,image/png" required>
+                <img id="photoPreview" alt="Photo Preview">
+            </label>
+            <label>Admission Number (1-9999):
+                <input type="number" id="admNo" min="1" max="9999" required>
+            </label>
+            <label>Form:
+                <select id="form" required>
+                    <option value="">Select Form</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </label>
+            <label>Stream:
+                <select id="stream" required>
+                    <option value="">Select Stream</option>
+                    <option value="K">K</option>
+                    <option value="L">L</option>
+                    <option value="Q">Q</option>
+                </select>
+            </label>
+            <button type="button" id="startBtn" onclick="startQuiz()">Start Quiz</button>
+        </div>
+        <div id="errorMsg" class="error"></div>
+        <div id="timer" style="display: none;">Time Remaining: 21:00</div>
+        <div class="quiz-container" id="quizContainer" style="display: none;">
+            <form id="quizForm">
+                <!-- Question 1 -->
+                <div class="question">
+                    <p>1. Which of the following is NOT a reason why plants need support?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q1" value="A"> A. To maintain their shape and structure</label>
+                        <label><input type="checkbox" name="q1" value="B"> B. To allow leaves to reach sunlight</label>
+                        <label><input type="checkbox" name="q1" value="C" data-correct="true"> C. To store excess water</label>
+                        <label><input type="checkbox" name="q1" value="D"> D. To prevent collapse under their own weight</label>
+                    </div>
+                </div>
+                <!-- Question 2 -->
+                <div class="question">
+                    <p>2. Why do plants need to move?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q2" value="A"> A. To escape from predators</label>
+                        <label><input type="checkbox" name="q2" value="B" data-correct="true"> B. To respond to environmental stimuli like light and gravity</label>
+                        <label><input type="checkbox" name="q2" value="C"> C. To change location for better soil</label>
+                        <label><input type="checkbox" name="q2" value="D"> D. To conserve energy</label>
+                    </div>
+                </div>
+                <!-- Question 3 -->
+                <div class="question">
+                    <p>3. Which plant structure is most critical for support against gravity?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q3" value="A"> A. Leaves</label>
+                        <label><input type="checkbox" name="q3" value="B"> B. Roots</label>
+                        <label><input type="checkbox" name="q3" value="C" data-correct="true"> C. Stems</label>
+                        <label><input type="checkbox" name="q3" value="D"> D. Flowers</label>
+                    </div>
+                </div>
+                <!-- Question 4 -->
+                <div class="question">
+                    <p>4. The necessity for movement in plants is primarily to:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q4" value="A"> A. Find food</label>
+                        <label><input type="checkbox" name="q4" value="B" data-correct="true"> B. Respond to light for photosynthesis</label>
+                        <label><input type="checkbox" name="q4" value="C"> C. Escape unfavorable conditions</label>
+                        <label><input type="checkbox" name="q4" value="D"> D. Increase reproduction rate</label>
+                    </div>
+                </div>
+                <!-- Question 5 -->
+                <div class="question">
+                    <p>5. Which of the following is a direct benefit of plant support systems?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q5" value="A"> A. Enhanced respiration</label>
+                        <label><input type="checkbox" name="q5" value="B"> B. Improved water absorption</label>
+                        <label><input type="checkbox" name="q5" value="C" data-correct="true"> C. Upright growth for sunlight capture</label>
+                        <label><input type="checkbox" name="q5" value="D"> D. Increased seed dispersal</label>
+                    </div>
+                </div>
+                <!-- Question 6 -->
+                <div class="question">
+                    <p>6. Which tissue provides flexible support in young herbaceous plants?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q6" value="A"> A. Xylem</label>
+                        <label><input type="checkbox" name="q6" value="B"> B. Phloem</label>
+                        <label><input type="checkbox" name="q6" value="C" data-correct="true"> C. Collenchyma</label>
+                        <label><input type="checkbox" name="q6" value="D"> D. Parenchyma</label>
+                    </div>
+                </div>
+                <!-- Question 7 -->
+                <div class="question">
+                    <p>7. In older plants, support is primarily provided by:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q7" value="A"> A. Turgidity of cells</label>
+                        <label><input type="checkbox" name="q7" value="B" data-correct="true"> B. Lignified xylem vessels</label>
+                        <label><input type="checkbox" name="q7" value="C"> C. Phloem fibers</label>
+                        <label><input type="checkbox" name="q7" value="D"> D. Epidermal cells</label>
+                    </div>
+                </div>
+                <!-- Question 8 -->
+                <div class="question">
+                    <p>8. Which tissue in plants is responsible for conducting water and providing support?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q8" value="A"> A. Phloem</label>
+                        <label><input type="checkbox" name="q8" value="B"> B. Parenchyma</label>
+                        <label><input type="checkbox" name="q8" value="C"> C. Collenchyma</label>
+                        <label><input type="checkbox" name="q8" value="D" data-correct="true"> D. Xylem</label>
+                    </div>
+                </div>
+                <!-- Question 9 -->
+                <div class="question">
+                    <p>9. The primary function of sclerenchyma tissue is:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q9" value="A"> A. Flexible support</label>
+                        <label><input type="checkbox" name="q9" value="B" data-correct="true"> B. Rigid support</label>
+                        <label><input type="checkbox" name="q9" value="C"> C. Water conduction</label>
+                        <label><input type="checkbox" name="q9" value="D"> D. Food storage</label>
+                    </div>
+                </div>
+                <!-- Question 10 -->
+                <div class="question">
+                    <p>10. Which of the following tissues is dead at maturity and provides support?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q10" value="A"> A. Collenchyma</label>
+                        <label><input type="checkbox" name="q10" value="B" data-correct="true"> B. Sclerenchyma</label>
+                        <label><input type="checkbox" name="q10" value="C"> C. Parenchyma</label>
+                        <label><input type="checkbox" name="q10" value="D"> D. Phloem</label>
+                    </div>
+                </div>
+                <!-- Question 11 -->
+                <div class="question">
+                    <p>11. In a herbaceous stem, which tissue provides support while allowing flexibility?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q11" value="A"> A. Xylem</label>
+                        <label><input type="checkbox" name="q11" value="B"> B. Phloem</label>
+                        <label><input type="checkbox" name="q11" value="C" data-correct="true"> C. Collenchyma</label>
+                        <label><input type="checkbox" name="q11" value="D"> D. Sclerenchyma</label>
+                    </div>
+                </div>
+                <!-- Question 12 -->
+                <div class="question">
+                    <p>12. Which of the following is NOT a characteristic of collenchyma cells?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q12" value="A"> A. Thickened cell walls</label>
+                        <label><input type="checkbox" name="q12" value="B"> B. Provides flexible support</label>
+                        <label><input type="checkbox" name="q12" value="C"> C. Found in young stems and leaves</label>
+                        <label><input type="checkbox" name="q12" value="D" data-correct="true"> D. Contains lignin</label>
+                    </div>
+                </div>
+                <!-- Question 13 -->
+                <div class="question">
+                    <p>13. The main difference between collenchyma and sclerenchyma is that:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q13" value="A"> A. Collenchyma is dead at maturity, while sclerenchyma is alive</label>
+                        <label><input type="checkbox" name="q13" value="B"> B. Collenchyma provides rigid support, while sclerenchyma provides flexible support</label>
+                        <label><input type="checkbox" name="q13" value="C" data-correct="true"> C. Collenchyma has unevenly thickened walls, while sclerenchyma has uniformly thickened walls</label>
+                        <label><input type="checkbox" name="q13" value="D"> D. Collenchyma is found in roots, while sclerenchyma is found in stems</label>
+                    </div>
+                </div>
+                <!-- Question 14 -->
+                <div class="question">
+                    <p>14. Which tissue is responsible for the hardness of nutshells?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q14" value="A"> A. Collenchyma</label>
+                        <label><input type="checkbox" name="q14" value="B"> B. Parenchyma</label>
+                        <label><input type="checkbox" name="q14" value="C" data-correct="true"> C. Sclerenchyma</label>
+                        <label><input type="checkbox" name="q14" value="D"> D. Xylem</label>
+                    </div>
+                </div>
+                <!-- Question 15 -->
+                <div class="question">
+                    <p>15. In a dicotyledonous plant, which tissue provides support in the vascular bundles?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q15" value="A"> A. Parenchyma</label>
+                        <label><input type="checkbox" name="q15" value="B"> B. Collenchyma</label>
+                        <label><input type="checkbox" name="q15" value="C" data-correct="true"> C. Sclerenchyma</label>
+                        <label><input type="checkbox" name="q15" value="D"> D. Epidermis</label>
+                    </div>
+                </div>
+                <!-- Question 16 -->
+                <div class="question">
+                    <p>16. What provides support in herbaceous plants?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q16" value="A"> A. Lignified xylem</label>
+                        <label><input type="checkbox" name="q16" value="B" data-correct="true"> B. Turgidity of cells</label>
+                        <label><input type="checkbox" name="q16" value="C"> C. Sclerenchyma fibers</label>
+                        <label><input type="checkbox" name="q16" value="D"> D. Thick bark</label>
+                    </div>
+                </div>
+                <!-- Question 17 -->
+                <div class="question">
+                    <p>17. In woody plants, the main supporting tissue is:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q17" value="A"> A. Parenchyma</label>
+                        <label><input type="checkbox" name="q17" value="B"> B. Collenchyma</label>
+                        <label><input type="checkbox" name="q17" value="C" data-correct="true"> C. Xylem</label>
+                        <label><input type="checkbox" name="q17" value="D"> D. Phloem</label>
+                    </div>
+                </div>
+                <!-- Question 18 -->
+                <div class="question">
+                    <p>18. Which of the following is NOT a feature of woody stems?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q18" value="A"> A. Presence of bark</label>
+                        <label><input type="checkbox" name="q18" value="B"> B. Lignified xylem</label>
+                        <label><input type="checkbox" name="q18" value="C" data-correct="true"> C. Flexible collenchyma</label>
+                        <label><input type="checkbox" name="q18" value="D"> D. Thickened cell walls</label>
+                    </div>
+                </div>
+                <!-- Question 19 -->
+                <div class="question">
+                    <p>19. The ability of a tree to stand upright is primarily due to:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q19" value="A"> A. Turgidity of leaf cells</label>
+                        <label><input type="checkbox" name="q19" value="B" data-correct="true"> B. Lignin in xylem vessels</label>
+                        <label><input type="checkbox" name="q19" value="C"> C. Phloem fibers</label>
+                        <label><input type="checkbox" name="q19" value="D"> D. Root pressure</label>
+                    </div>
+                </div>
+                <!-- Question 20 -->
+                <div class="question">
+                    <p>20. Which part of a tree trunk provides the most support?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q20" value="A"> A. Outer bark</label>
+                        <label><input type="checkbox" name="q20" value="B"> B. Inner bark (phloem)</label>
+                        <label><input type="checkbox" name="q20" value="C"> C. Sapwood (young xylem)</label>
+                        <label><input type="checkbox" name="q20" value="D" data-correct="true"> D. Heartwood (old xylem)</label>
+                    </div>
+                </div>
+                <!-- Question 21 -->
+                <div class="question">
+                    <p>21. Which type of movement in plants is a response to light?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q21" value="A"> A. Geotropism</label>
+                        <label><input type="checkbox" name="q21" value="B"> B. Thigmotropism</label>
+                        <label><input type="checkbox" name="q21" value="C" data-correct="true"> C. Phototropism</label>
+                        <label><input type="checkbox" name="q21" value="D"> D. Nastic movement</label>
+                    </div>
+                </div>
+                <!-- Question 22 -->
+                <div class="question">
+                    <p>22. The growth of roots towards gravity is an example of:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q22" value="A"> A. Positive phototropism</label>
+                        <label><input type="checkbox" name="q22" value="B"> B. Negative phototropism</label>
+                        <label><input type="checkbox" name="q22" value="C" data-correct="true"> C. Positive geotropism</label>
+                        <label><input type="checkbox" name="q22" value="D"> D. Negative geotropism</label>
+                    </div>
+                </div>
+                <!-- Question 23 -->
+                <div class="question">
+                    <p>23. Thigmotropism is a response to:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q23" value="A"> A. Light</label>
+                        <label><input type="checkbox" name="q23" value="B"> B. Gravity</label>
+                        <label><input type="checkbox" name="q23" value="C" data-correct="true"> C. Touch</label>
+                        <label><input type="checkbox" name="q23" value="D"> D. Chemicals</label>
+                    </div>
+                </div>
+                <!-- Question 24 -->
+                <div class="question">
+                    <p>24. The closing of the Venus flytrap is an example of:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q24" value="A"> A. Phototropism</label>
+                        <label><input type="checkbox" name="q24" value="B"> B. Geotropism</label>
+                        <label><input type="checkbox" name="q24" value="C" data-correct="true"> C. Thigmotropism</label>
+                        <label><input type="checkbox" name="q24" value="D"> D. Hydrotropism</label>
+                    </div>
+                </div>
+                <!-- Question 25 -->
+                <div class="question">
+                    <p>25. Which of the following is NOT a type of tropism?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q25" value="A"> A. Phototropism</label>
+                        <label><input type="checkbox" name="q25" value="B"> B. Geotropism</label>
+                        <label><input type="checkbox" name="q25" value="C" data-correct="true"> C. Nastic movement</label>
+                        <label><input type="checkbox" name="q25" value="D"> D. Thigmotropism</label>
+                    </div>
+                </div>
+                <!-- Question 26 -->
+                <div class="question">
+                    <p>26. The movement of a plant part away from gravity is called:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q26" value="A"> A. Positive geotropism</label>
+                        <label><input type="checkbox" name="q26" value="B" data-correct="true"> B. Negative geotropism</label>
+                        <label><input type="checkbox" name="q26" value="C"> C. Positive phototropism</label>
+                        <label><input type="checkbox" name="q26" value="D"> D. Negative phototropism</label>
+                    </div>
+                </div>
+                <!-- Question 27 -->
+                <div class="question">
+                    <p>27. Which of the following is an example of nastic movement?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q27" value="A"> A. Growth of roots towards water</label>
+                        <label><input type="checkbox" name="q27" value="B"> B. Bending of shoots towards light</label>
+                        <label><input type="checkbox" name="q27" value="C" data-correct="true"> C. Closing of mimosa leaves when touched</label>
+                        <label><input type="checkbox" name="q27" value="D"> D. Growth of tendrils around a support</label>
+                    </div>
+                </div>
+                <!-- Question 28 -->
+                <div class="question">
+                    <p>28. The primary difference between tropisms and nastic movements is that:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q28" value="A" data-correct="true"> RUNNING_HEAD: A. Tropisms are directional, while nastic movements are non-directional</label>
+                        <label><input type="checkbox" name="q28" value="B"> B. Tropisms are slow, while nastic movements are fast</label>
+                        <label><input type="checkbox" name="q28" value="C"> C. Tropisms occur only in stems, while nastic movements occur only in leaves</label>
+                        <label><input type="checkbox" name="q28" value="D"> D. Tropisms are reversible, while nastic movements are not</label>
+                    </div>
+                </div>
+                <!-- Question 29 -->
+                <div class="question">
+                    <p>29. Which of the following is a characteristic of nastic movements?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q29" value="A"> A. Dependent on the direction of the stimulus</label>
+                        <label><input type="checkbox" name="q29" value="B" data-correct="true"> B. Independent of the direction of the stimulus</label>
+                        <label><input type="checkbox" name="q29" value="C"> C. Occurs only in response to light</label>
+                        <label><input type="checkbox" name="q29" value="D"> D. Involves rapid growth</label>
+                    </div>
+                </div>
+                <!-- Question 30 -->
+                <div class="question">
+                    <p>30. The growth of tendrils around a support is an example of:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q30" value="A"> A. Phototropism</label>
+                        <label><input type="checkbox" name="q30" value="B"> B. Geotropism</label>
+                        <label><input type="checkbox" name="q30" value="C" data-correct="true"> C. Thigmotropism</label>
+                        <label><input type="checkbox" name="q30" value="D"> D. Hydrotropism</label>
+                    </div>
+                </div>
+                <!-- Question 31 -->
+                <div class="question">
+                    <p>31. Which tissue in plants is responsible for turgidity-based support?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q31" value="A"> A. Sclerenchyma</label>
+                        <label><input type="checkbox" name="q31" value="B" data-correct="true"> B. Parenchyma</label>
+                        <label><input type="checkbox" name="q31" value="C"> C. Collenchyma</label>
+                        <label><input type="checkbox" name="q31" value="D"> D. Xylem</label>
+                    </div>
+                </div>
+                <!-- Question 32 -->
+                <div class="question">
+                    <p>32. The main role of lignin in xylem is to:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q32" value="A"> A. Conduct water</label>
+                        <label><input type="checkbox" name="q32" value="B" data-correct="true"> B. Provide rigid support</label>
+                        <label><input type="checkbox" name="q32" value="C"> C. Store food</label>
+                        <label><input type="checkbox" name="q32" value="D"> D. Transport sugars</label>
+                    </div>
+                </div>
+                <!-- Question 33 -->
+                <div class="question">
+                    <p>33. Which of the following is NOT a supporting tissue in plants?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q33" value="A"> A. Collenchyma</label>
+                        <label><input type="checkbox" name="q33" value="B"> B. Sclerenchyma</label>
+                        <label><input type="checkbox" name="q33" value="C" data-correct="true"> C. Phloem</label>
+                        <label><input type="checkbox" name="q33" value="D"> D. Xylem</label>
+                    </div>
+                </div>
+                <!-- Question 34 -->
+                <div class="question">
+                    <p>34. In monocotyledonous plants, support is mainly provided by:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q34" value="A" data-correct="true"> A. Lignified xylem</label>
+                        <label><input type="checkbox" name="q34" value="B"> B. Collenchyma</label>
+                        <label><input type="checkbox" name="q34" value="C"> C. Parenchyma</label>
+                        <label><input type="checkbox" name="q34" value="D"> D. Phloem</label>
+                    </div>
+                </div>
+                <!-- Question 35 -->
+                <div class="question">
+                    <p>35. Which of the following is a non-directional movement in plants?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q35" value="A"> A. Phototropism</label>
+                        <label><input type="checkbox" name="q35" value="B"> B. Geotropism</label>
+                        <label><input type="checkbox" name="q35" value="C" data-correct="true"> C. Nastic movement</label>
+                        <label><input type="checkbox" name="q35" value="D"> D. Thigmotropism</label>
+                    </div>
+                </div>
+                <!-- Question 36 -->
+                <div class="question">
+                    <p>36. Which of the following is an example of positive phototropism?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q36" value="A"> A. Roots growing away from light</label>
+                        <label><input type="checkbox" name="q36" value="B" data-correct="true"> B. Shoots growing towards light</label>
+                        <label><input type="checkbox" name="q36" value="C"> C. Leaves closing at night</label>
+                        <label><input type="checkbox" name="q36" value="D"> D. Tendrils wrapping around a support</label>
+                    </div>
+                </div>
+                <!-- Question 37 -->
+                <div class="question">
+                    <p>37. The main difference between collenchyma and parenchyma is that:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q37" value="A"> A. Collenchyma is dead, while parenchyma is alive</label>
+                        <label><input type="checkbox" name="q37" value="B" data-correct="true"> B. Collenchyma has thickened walls for support, while parenchyma is for storage</label>
+                        <label><input type="checkbox" name="q37" value="C"> C. Parenchyma provides rigid support, while collenchyma is flexible</label>
+                        <label><input type="checkbox" name="q37" value="D"> D. Both are dead at maturity</label>
+                    </div>
+                </div>
+                <!-- Question 38 -->
+                <div class="question">
+                    <p>38. Which tissue is found in the cortex of young stems and provides support?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q38" value="A"> A. Xylem</label>
+                        <label><input type="checkbox" name="q38" value="B" data-correct="true"> B. Collenchyma</label>
+                        <label><input type="checkbox" name="q38" value="C"> C. Sclerenchyma</label>
+                        <label><input type="checkbox" name="q38" value="D"> D. Phloem</label>
+                    </div>
+                </div>
+                <!-- Question 39 -->
+                <div class="question">
+                    <p>39. The primary function of turgidity in herbaceous plants is to:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q39" value="A"> A. Conduct water</label>
+                        <label><input type="checkbox" name="q39" value="B" data-correct="true"> B. Provide flexible support</label>
+                        <label><input type="checkbox" name="q39" value="C"> C. Store nutrients</label>
+                        <label><input type="checkbox" name="q39" value="D"> D. Transport sugars</label>
+                    </div>
+                </div>
+                <!-- Question 40 -->
+                <div class="question">
+                    <p>40. Which of the following is NOT involved in plant support?</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q40" value="A"> A. Lignin</label>
+                        <label><input type="checkbox" name="q40" value="B"> B. Cellulose</label>
+                        <label><input type="checkbox" name="q40" value="C" data-correct="true"> C. Chlorophyll</label>
+                        <label><input type="checkbox" name="q40" value="D"> D. Turgor pressure</label>
+                    </div>
+                </div>
+                <!-- Question 41 -->
+                <div class="question">
+                    <p>41. The main supporting tissue in the stem of a mature tree is:</p>
+                    <div class="options">
+                        <label><input type="checkbox" name="q41" value="A"> A. Collenchyma</label>
+                        <label><input type="checkbox" name="q41" value="B"> B. Parenchyma</label>
+                        <label><input type="checkbox" name="q41" value="C" data-correct="true"> C. Xylem</label>
+                        <label><input type="checkbox" name="q41" value="D"> D. Phloem</label>
+                    </div>
+                </div>
+                <div id="score" style="display: none;"></div>
+                <button type="button" id="submitBtn" onclick="submitQuiz()">Submit</button>
+                <button type="button" id="printBtn" onclick="window.print()">Print</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let timerInterval;
+        let timeLeft = 21 * 60; // 21 minutes in seconds
+        let unansweredQuestions = [];
+
+        // Handle photo upload and preview
+        document.getElementById('photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const errorMsg = document.getElementById('errorMsg');
+            const preview = document.getElementById('photoPreview');
+
+            // Reset preview and error
+            preview.style.display = 'none';
+            errorMsg.textContent = '';
+            errorMsg.style.display = 'none';
+
+            if (!file) {
+                return;
+            }
+
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                errorMsg.textContent = 'Please upload a JPG or PNG image.';
+                errorMsg.style.display = 'block';
+                this.value = ''; // Clear input
+                return;
+            }
+
+            // Validate file size (2MB = 2 * 1024 * 1024 bytes)
+            if (file.size > 2 * 1024 * 1024) {
+                errorMsg.textContent = 'Photo must be 2MB or less.';
+                errorMsg.style.display = 'block';
+                this.value = ''; // Clear input
+                return;
+            }
+
+            // Display preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                } catch (err) {
+                    console.error('Error displaying photo preview:', err);
+                    errorMsg.textContent = 'Error displaying photo. Please try another image.';
+                    errorMsg.style.display = 'block';
+                }
+            };
+            reader.onerror = function(err) {
+                console.error('Error reading file:', err);
+                errorMsg.textContent = 'Error reading photo. Please try another image.';
+                errorMsg.style.display = 'block';
+                this.value = ''; // Clear input
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Function to update unanswered questions and scroll to next or submit
+        function updateUnansweredQuestions() {
+            unansweredQuestions = [];
+            document.querySelectorAll('.question').forEach((question, index) => {
+                const checked = question.querySelector(`input[name="q${index + 1}"]:checked`);
+                if (!checked) {
+                    unansweredQuestions.push({ index, element: question });
+                }
+            });
+
+            const errorMsg = document.getElementById('errorMsg');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (unansweredQuestions.length > 0) {
+                const nextUnanswered = unansweredQuestions[0].element;
+                errorMsg.textContent = `Please answer all questions. ${unansweredQuestions.length} question(s) unanswered.`;
+                errorMsg.style.display = 'block';
+                nextUnanswered.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                nextUnanswered.classList.add('highlight');
+                setTimeout(() => nextUnanswered.classList.remove('highlight'), 3000);
+            } else {
+                errorMsg.style.display = 'none';
+                submitBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                submitBtn.classList.add('submit-highlight');
+                setTimeout(() => submitBtn.classList.remove('submit-highlight'), 6000);
+            }
+        }
+
+        // Ensure only one checkbox per question, lock after selection, and navigate to next unanswered
+        document.querySelectorAll('.question').forEach((question, index) => {
+            const checkboxes = question.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        // Lock all checkboxes in this question
+                        checkboxes.forEach(cb => {
+                            cb.disabled = true;
+                            const label = cb.parentElement;
+                            label.classList.remove('correct', 'incorrect');
+                            if (cb.dataset.correct === 'true') {
+                                label.classList.add('correct');
+                            } else if (cb.checked) {
+                                label.classList.add('incorrect');
+                            }
+                        });
+                        // Update unanswered questions and scroll to next
+                        updateUnansweredQuestions();
+                    }
+                });
+            });
+        });
+
+        // Check if the user can submit based on the 10-minute lockout
+        function canSubmit() {
+            const admNo = document.getElementById('admNo').value.trim();
+            if (!admNo) return true;
+            const lastSubmission = localStorage.getItem(`lastSubmission_${admNo}_part1`);
+            if (!lastSubmission) return true;
+            const now = Date.now();
+            const tenMinutes = 10 * 60 * 1000; // 10 minutes in milliseconds
+            return now - parseInt(lastSubmission) > tenMinutes;
+        }
+
+        // Start the quiz
+        function startQuiz() {
+            const surname = document.getElementById('surname').value.trim();
+            const firstName = document.getElementById('firstName').value.trim();
+            const photo = document.getElementById('photo').files[0];
+            const admNo = document.getElementById('admNo').value.trim();
+            const form = document.getElementById('form').value;
+            const stream = document.getElementById('stream').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const preview = document.getElementById('photoPreview');
+
+            // Validate inputs
+            if (!surname || !firstName || !photo || !admNo || !form || !stream) {
+                errorMsg.textContent = 'Please fill all required fields and upload a photo.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (admNo < 1 || admNo > 9999) {
+                errorMsg.textContent = 'Admission number must be between 1 and 9999.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // Validate photo
+            const validTypes = ['image/jpeg', 'image/png'];
+            if (!validTypes.includes(photo.type)) {
+                errorMsg.textContent = 'Please upload a JPG or PNG image.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (photo.size > 2 * 1024 * 1024) {
+                errorMsg.textContent = 'Photo must be 2MB or less.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (!preview.src || preview.style.display === 'none') {
+                errorMsg.textContent = 'Photo preview not loaded. Please re-upload the photo.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // Check retake lockout
+            if (!canSubmit()) {
+                errorMsg.textContent = 'You must wait 10 minutes before retaking the quiz.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // Hide error and show quiz
+            errorMsg.style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('timer').style.display = 'block';
+            document.getElementById('startBtn').disabled = true;
+
+            // Start timer
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('timer').textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitQuiz(true);
+                }
+            }, 1000);
+        }
+
+        // Handle quiz submission
+        function submitQuiz(isAutoSubmit = false) {
+            const errorMsg = document.getElementById('errorMsg');
+            const submitBtn = document.getElementById('submitBtn');
+            const scoreDiv = document.getElementById('score');
+
+            // Check for unanswered questions
+            updateUnansweredQuestions();
+
+            // If auto-submit (time's up) or no unanswered questions, calculate score
+            if (isAutoSubmit || unansweredQuestions.length === 0) {
+                let score = 0;
+                for (let i = 1; i <= 41; i++) {
+                    const checked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if (checked && checked.dataset.correct === 'true') {
+                        score++;
+                    }
+                }
+
+                // Display score
+                scoreDiv.textContent = `Your Score: ${score}/41 (${((score / 41) * 100).toFixed(2)}%)`;
+                scoreDiv.style.display = 'block';
+
+                // Disable quiz interaction
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = true);
+                submitBtn.disabled = true;
+                clearInterval(timerInterval);
+                document.getElementById('timer').style.display = 'none';
+
+                // Store submission time
+                const admNo = document.getElementById('admNo').value.trim();
+                if (admNo) {
+                    localStorage.setItem(`lastSubmission_${admNo}_part1`, Date.now());
+                }
+            }
+        }
+    </script>
+</body>
+</html>
