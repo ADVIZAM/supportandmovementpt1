@@ -1,69 +1,69 @@
-Question 1: Which of the following is NOT a reason why plants need support?
-A: To maintain their shape and structure
-B: To allow leaves to reach sunlight
-C: To store excess water
-D: To prevent collapse under their own weight
-Correct: C
+Question 1: What is the primary function of the xylem tissue in plants?
+A: Transport of water and minerals
+B: Transport of food
+C: Support and strength
+D: Photosynthesis
+Correct: A
 
-Question 2: Why do plants need to move?
-A: To escape from predators
-B: To respond to environmental stimuli like light and gravity
-C: To change location for better soil
-D: To conserve energy
+Question 2: Which type of skeleton is found in insects?
+A: Endoskeleton
+B: Exoskeleton
+C: Hydrostatic skeleton
+D: Cartilaginous skeleton
 Correct: B
 
-Question 3: Which plant structure is most critical for support against gravity?
-A: Leaves
-B: Roots
-C: Stems
-D: Flowers
-Correct: C
-
-Question 4: The necessity for movement in plants is primarily to:
-A: Find food
-B: Respond to light for photosynthesis
-C: Escape unfavorable conditions
-D: Increase reproduction rate
+Question 3: What type of movement in plants is caused by changes in turgor pressure?
+A: Tropism
+B: Nastic movement
+C: Geotropism
+D: Phototropism
 Correct: B
 
-Question 5: Which of the following is a direct benefit of plant support systems?
-A: Enhanced respiration
-B: Improved water absorption
-C: Upright growth for sunlight capture
-D: Increased seed dispersal
+Question 4: Which bone forms the upper arm in humans?
+A: Radius
+B: Ulna
+C: Humerus
+D: Femur
 Correct: C
 
-Question 6: Which tissue provides flexible support in young herbaceous plants?
-A: Xylem
-B: Phloem
-C: Collenchyma
-D: Parenchyma
+Question 5: What is the role of collenchyma cells in plants?
+A: Photosynthesis
+B: Storage of nutrients
+C: Providing flexible support
+D: Water transport
 Correct: C
 
-Question 7: In older plants, support is primarily provided by:
-A: Turgidity of cells
-B: Lignified xylem vessels
-C: Phloem fibers
-D: Epidermal cells
-Correct: B
+Question 6: Which muscle type is responsible for voluntary movements in animals?
+A: Smooth muscle
+B: Cardiac muscle
+C: Skeletal muscle
+D: Involuntary muscle
+Correct: C
 
-Question 8: Which tissue in plants is responsible for conducting water and providing support?
-A: Phloem
-B: Parenchyma
-C: Collenchyma
-D: Xylem
-Correct: D
+Question 7: What is the main component of plant cell walls that provides structural support?
+A: Cellulose
+B: Starch
+C: Protein
+D: Lignin
+Correct: A
 
-Question 9: The primary function of sclerenchyma tissue is:
-A: Flexible support
-B: Rigid support
-C: Water conduction
-D: Food storage
-Correct: B
+Question 8: Which joint allows movement in multiple directions, such as in the shoulder?
+A: Hinge joint
+B: Pivot joint
+C: Ball and socket joint
+D: Fixed joint
+Correct: C
 
-Question 10: Which of the following tissues is dead at maturity and provides support?
-A: Collenchyma
-B: Sclerenchyma
-C: Parenchyma
-D: Phloem
+Question 9: What type of tropism causes a plant to grow towards light?
+A: Geotropism
+B: Hydrotropism
+C: Phototropism
+D: Thigmotropism
+Correct: C
+
+Question 10: Which structure in vertebrates provides flexibility and support to the spinal column?
+A: Ribs
+B: Vertebrae
+C: Cartilage
+D: Ligaments
 Correct: B
