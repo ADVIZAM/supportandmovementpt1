@@ -378,7 +378,7 @@
         }
 
         // Render questions
-        function renderQuestions() {
+        function renderQuestions(readOnly = false, savedAnswers = []) {
             const quizForm = document.getElementById('quizForm');
             const score = document.getElementById('score');
             const submitBtn = document.getElementById('submitBtn');
@@ -387,24 +387,49 @@
 
             quizForm.innerHTML = '';
             questions.forEach((q, i) => {
+                const savedAnswer = readOnly ? savedAnswers.find(a => a.questionText.includes(q.text)) : null;
+                const selectedOption = savedAnswer ? savedAnswer.selectedAnswer.split('. ')[1] : null;
+                const isCorrect = savedAnswer ? savedAnswer.isCorrect : false;
+
                 const div = document.createElement('div');
                 div.className = 'question';
                 div.innerHTML = `
                     <p>${q.index}. ${q.text}</p>
                     <div class="options">
-                        <label><input type="checkbox" name="q${q.index}" value="A" ${q.correct === 'A' ? 'data-correct="true"' : ''}> A. ${q.options.A}</label>
-                        <label><input type="checkbox" name="q${q.index}" value="B" ${q.correct === 'B' ? 'data-correct="true"' : ''}> B. ${q.options.B}</label>
-                        <label><input type="checkbox" name="q${q.index}" value="C" ${q.correct === 'C' ? 'data-correct="true"' : ''}> C. ${q.options.C}</label>
-                        <label><input type="checkbox" name="q${q.index}" value="D" ${q.correct === 'D' ? 'data-correct="true"' : ''}> D. ${q.options.D}</label>
+                        <label><input type="checkbox" name="q${q.index}" value="A" ${q.correct === 'A' ? 'data-correct="true"' : ''} ${selectedOption === q.options.A ? 'checked' : ''} ${readOnly ? 'disabled' : ''}> A. ${q.options.A}</label>
+                        <label><input type="checkbox" name="q${q.index}" value="B" ${q.correct === 'B' ? 'data-correct="true"' : ''} ${selectedOption === q.options.B ? 'checked' : ''} ${readOnly ? 'disabled' : ''}> B. ${q.options.B}</label>
+                        <label><input type="checkbox" name="q${q.index}" value="C" ${q.correct === 'C' ? 'data-correct="true"' : ''} ${selectedOption === q.options.C ? 'checked' : ''} ${readOnly ? 'disabled' : ''}> C. ${q.options.C}</label>
+                        <label><input type="checkbox" name="q${q.index}" value="D" ${q.correct === 'D' ? 'data-correct="true"' : ''} ${selectedOption === q.options.D ? 'checked' : ''} ${readOnly ? 'disabled' : ''}> D. ${q.options.D}</label>
                     </div>
                 `;
                 quizForm.appendChild(div);
+
+                if (readOnly && selectedOption) {
+                    const selectedCheckbox = div.querySelector(`input[name="q${q.index}"][value="${Object.keys(q.options).find(k => q.options[k] === selectedOption)}"]`);
+                    if (selectedCheckbox) {
+                        const label = selectedCheckbox.parentElement;
+                        label.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    }
+                    const correctCheckbox = div.querySelector(`input[name="q${q.index}"][value="${q.correct}"]`);
+                    if (correctCheckbox) {
+                        correctCheckbox.parentElement.classList.add('correct');
+                    }
+                }
             });
+
+            score.textContent = readOnly ? `Your Score: ${quizData.score}` : '';
+            score.style.display = readOnly ? 'block' : 'none';
+            submitBtn.style.display = readOnly ? 'none' : 'inline-block';
+            printBtn.style.display = readOnly ? 'inline-block' : 'none';
+            emailBtn.style.display = readOnly ? 'inline-block' : 'none';
             quizForm.appendChild(score);
             quizForm.appendChild(submitBtn);
             quizForm.appendChild(printBtn);
             quizForm.appendChild(emailBtn);
-            attachCheckboxListeners();
+
+            if (!readOnly) {
+                attachCheckboxListeners();
+            }
         }
 
         // Attach checkbox listeners
@@ -526,7 +551,7 @@
         // Check if submission is allowed
         async function canSubmit(admNo, ipAddress) {
             const errorMsg = document.getElementById('errorMsg');
-            if (!admNo || !ipAddress) return false;
+            if (!admNo || !ipAddress) return { canStart: false, hasSubmitted: false };
 
             // Check for previous submission
             const submissionKey = `submission_${admNo}_part1`;
@@ -534,9 +559,9 @@
             if (submissionData) {
                 const { ip } = JSON.parse(submissionData);
                 if (ip === ipAddress) {
-                    errorMsg.textContent = 'You have already submitted this quiz.';
+                    errorMsg.textContent = 'You have already submitted this quiz. Your previous answers are displayed below.';
                     errorMsg.style.display = 'block';
-                    return false;
+                    return { canStart: false, hasSubmitted: true, savedData: JSON.parse(submissionData) };
                 }
             }
 
@@ -552,13 +577,13 @@
                     const remainingHours = Math.ceil(remainingMs / (60 * 60 * 1000));
                     errorMsg.textContent = `Your IP is locked out. Try again in ${remainingHours} hour(s).`;
                     errorMsg.style.display = 'block';
-                    return false;
+                    return { canStart: false, hasSubmitted: false };
                 } else {
                     localStorage.removeItem(lockoutKey); // Clear expired lockout
                 }
             }
 
-            return true;
+            return { canStart: true, hasSubmitted: false };
         }
 
         // Start the quiz
@@ -607,31 +632,48 @@
 
             // Fetch IP and check submission
             quizData.ipAddress = await getIPAddress();
-            if (!(await canSubmit(admNo, quizData.ipAddress))) {
-                return;
+            const submissionStatus = await canSubmit(admNo, quizData.ipAddress);
+            if (!submissionStatus.canStart && !submissionStatus.hasSubmitted) {
+                return; // IP lockout
             }
 
             quizData.studentInfo = { surname, firstName, otherName: document.getElementById('otherName').value.trim(), admNo, form, stream };
-            timeLeft = questions.length * 30; // 30 seconds per question
 
-            errorMsg.style.display = 'none';
+            errorMsg.style.display = 'block'; // Keep error message visible for prior submissions
             document.getElementById('quizContainer').style.display = 'block';
-            document.getElementById('timer').style.display = 'block';
             document.getElementById('startBtn').disabled = true;
 
-            renderQuestions();
+            if (submissionStatus.hasSubmitted) {
+                // Load previous submission
+                quizData = submissionStatus.savedData.quizData;
+                document.getElementById('timer').style.display = 'none';
+                renderQuestions(true, quizData.answers);
+                document.getElementById('surname').value = quizData.studentInfo.surname;
+                document.getElementById('firstName').value = quizData.studentInfo.firstName;
+                document.getElementById('otherName').value = quizData.studentInfo.otherName || '';
+                document.getElementById('admNo').value = quizData.studentInfo.admNo;
+                document.getElementById('form').value = quizData.studentInfo.form;
+                document.getElementById('stream').value = quizData.studentInfo.stream;
+                document.getElementById('photoPreview').src = quizData.photoBase64 || '';
+                document.getElementById('photoPreview').style.display = quizData.photoBase64 ? 'block' : 'none';
+            } else {
+                // New quiz
+                timeLeft = questions.length * 30; // 30 seconds per question
+                document.getElementById('timer').style.display = 'block';
+                renderQuestions();
 
-            const timerDisplay = document.getElementById('timer');
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                timerDisplay.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    submitQuiz(true);
-                }
-            }, 1000);
+                const timerDisplay = document.getElementById('timer');
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    timerDisplay.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        submitQuiz(true);
+                    }
+                }, 1000);
+            }
         }
 
         // Handle quiz submission
@@ -684,7 +726,8 @@
                     const submissionKey = `submission_${admNo}_part1`;
                     localStorage.setItem(submissionKey, JSON.stringify({
                         ip: quizData.ipAddress,
-                        timestamp: Date.now()
+                        timestamp: Date.now(),
+                        quizData
                     }));
 
                     // Store IP lockout if timer expired
