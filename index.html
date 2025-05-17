@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Support and Movement in Plants and Animals Quiz (Form 4, Part 1)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -135,6 +136,9 @@
             50% { background: #e74c3c; }
             100% { background: #3498db; }
         }
+        #printBtn, #emailBtn {
+            display: none;
+        }
         @media print {
             button, #timer, .error {
                 display: none !important;
@@ -210,66 +214,178 @@
             <button type="button" id="startBtn" onclick="startQuiz()">Start Quiz</button>
         </div>
         <div id="errorMsg" class="error"></div>
-        <div id="timer" style="display: none;">Time Remaining: 21:00</div>
+        <div id="timer" style="display: none;"></div>
         <div class="quiz-container" id="quizContainer" style="display: none;">
             <form id="quizForm">
                 <div id="score" style="display: none;"></div>
                 <button type="button" id="submitBtn" onclick="submitQuiz()">Submit</button>
-                <button type="button" id="printBtn" onclick="window.print()">Print</button>
-                <button type="button" id="emailBtn" onclick="sendEmail()" style="display: none;">Send to Email</button>
+                <button type="button" id="printBtn" onclick="handlePrint()">Print</button>
+                <button type="button" id="emailBtn" onclick="sendEmail()">Send to Email</button>
             </form>
         </div>
     </div>
 
     <script>
         let timerInterval;
-        let timeLeft = 21 * 60; // 21 minutes in seconds
+        let timeLeft; // Set dynamically in startQuiz
         let unansweredQuestions = [];
-        let quizData = {}; // Store quiz data for email
-        let questions = []; // Store parsed questions
-
-        // Load questions from questions.txt
-        async function loadQuestions() {
-            try {
-                const response = await fetch('questions.txt');
-                if (!response.ok) throw new Error('Failed to load questions.txt');
-                const text = await response.text();
-                parseQuestions(text);
-                renderQuestions();
-            } catch (err) {
-                console.error('Error loading questions:', err);
-                document.getElementById('errorMsg').textContent = 'Error loading questions. Please ensure questions.txt is present.';
-                document.getElementById('errorMsg').style.display = 'block';
-                return false;
+        let quizData = {}; // Store quiz data
+        let questions = [
+            {
+                index: 1,
+                text: "What is the primary function of the xylem tissue in plants?",
+                options: {
+                    A: "Transport of water and minerals",
+                    B: "Transport of food",
+                    C: "Support and strength",
+                    D: "Photosynthesis"
+                },
+                correct: "A"
+            },
+            {
+                index: 2,
+                text: "Which type of skeleton is found in insects?",
+                options: {
+                    A: "Endoskeleton",
+                    B: "Exoskeleton",
+                    C: "Hydrostatic skeleton",
+                    D: "Cartilaginous skeleton"
+                },
+                correct: "B"
+            },
+            {
+                index: 3,
+                text: "What type of movement in plants is caused by changes in turgor pressure?",
+                options: {
+                    A: "Tropism",
+                    B: "Nastic movement",
+                    C: "Geotropism",
+                    D: "Phototropism"
+                },
+                correct: "B"
+            },
+            {
+                index: 4,
+                text: "Which bone forms the upper arm in humans?",
+                options: {
+                    A: "Radius",
+                    B: "Ulna",
+                    C: "Humerus",
+                    D: "Femur"
+                },
+                correct: "C"
+            },
+            {
+                index: 5,
+                text: "What is the role of collenchyma cells in plants?",
+                options: {
+                    A: "Photosynthesis",
+                    B: "Storage of nutrients",
+                    C: "Providing flexible support",
+                    D: "Water transport"
+                },
+                correct: "C"
+            },
+            {
+                index: 6,
+                text: "Which muscle type is responsible for voluntary movements in animals?",
+                options: {
+                    A: "Smooth muscle",
+                    B: "Cardiac muscle",
+                    C: "Skeletal muscle",
+                    D: "Involuntary muscle"
+                },
+                correct: "C"
+            },
+            {
+                index: 7,
+                text: "What is the main component of plant cell walls that provides structural support?",
+                options: {
+                    A: "Cellulose",
+                    B: "Starch",
+                    C: "Protein",
+                    D: "Lignin"
+                },
+                correct: "A"
+            },
+            {
+                index: 8,
+                text: "Which joint allows movement in multiple directions, such as in the shoulder?",
+                options: {
+                    A: "Hinge joint",
+                    B: "Pivot joint",
+                    C: "Ball and socket joint",
+                    D: "Fixed joint"
+                },
+                correct: "C"
+            },
+            {
+                index: 9,
+                text: "What type of tropism causes a plant to grow towards light?",
+                options: {
+                    A: "Geotropism",
+                    B: "Hydrotropism",
+                    C: "Phototropism",
+                    D: "Thigmotropism"
+                },
+                correct: "C"
+            },
+            {
+                index: 10,
+                text: "Which structure in vertebrates provides flexibility and support to the spinal column?",
+                options: {
+                    A: "Ribs",
+                    B: "Vertebrae",
+                    C: "Cartilage",
+                    D: "Ligaments"
+                },
+                correct: "B"
             }
-            return true;
+        ];
+
+        // Fetch IP address
+        async function getIPAddress() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (err) {
+                console.error('Error fetching IP address:', err);
+                return 'unknown';
+            }
         }
 
-        // Parse questions from text
-        function parseQuestions(text) {
-            questions = [];
-            const questionBlocks = text.trim().split('\n\n');
-            questionBlocks.forEach((block, index) => {
-                const lines = block.split('\n');
-                if (lines.length >= 6) {
-                    const questionText = lines[0].replace(/^Question \d+: /, '');
-                    const options = {
-                        A: lines[1].replace(/^A: /, ''),
-                        B: lines[2].replace(/^B: /, ''),
-                        C: lines[3].replace(/^C: /, ''),
-                        D: lines[4].replace(/^D: /, '')
-                    };
-                    const correct = lines[5].replace(/^Correct: /, '');
-                    questions.push({ index: index + 1, text: questionText, options, correct });
-                }
+        // Handle print and PDF generation
+        function handlePrint() {
+            const element = document.getElementById('pdfContent');
+            const errorMsg = document.getElementById('errorMsg');
+
+            const opt = {
+                margin: 10,
+                filename: `Quiz_${quizData.studentInfo?.surname || 'Student'}_${quizData.studentInfo?.firstName || 'Unknown'}_${quizData.studentInfo?.admNo || 'NoAdmNo'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().catch(err => {
+                console.error('Error generating PDF:', err);
+                errorMsg.textContent = 'Error generating PDF. Please try again.';
+                errorMsg.style.display = 'block';
             });
+
+            window.print();
         }
 
-        // Render questions in the form
+        // Render questions
         function renderQuestions() {
             const quizForm = document.getElementById('quizForm');
+            const score = document.getElementById('score');
             const submitBtn = document.getElementById('submitBtn');
-            quizForm.innerHTML = ''; // Clear existing content
+            const printBtn = document.getElementById('printBtn');
+            const emailBtn = document.getElementById('emailBtn');
+
+            quizForm.innerHTML = '';
             questions.forEach((q, i) => {
                 const div = document.createElement('div');
                 div.className = 'question';
@@ -284,30 +400,26 @@
                 `;
                 quizForm.appendChild(div);
             });
-            // Re-append buttons
-            quizForm.appendChild(document.getElementById('score'));
+            quizForm.appendChild(score);
             quizForm.appendChild(submitBtn);
-            quizForm.appendChild(document.getElementById('printBtn'));
-            quizForm.appendChild(document.getElementById('emailBtn'));
-            // Re-attach checkbox event listeners
+            quizForm.appendChild(printBtn);
+            quizForm.appendChild(emailBtn);
             attachCheckboxListeners();
         }
 
-        // Attach event listeners to checkboxes
+        // Attach checkbox listeners
         function attachCheckboxListeners() {
             document.querySelectorAll('.question').forEach((question, index) => {
                 const checkboxes = question.querySelectorAll('input[type="checkbox"]');
                 checkboxes.forEach(checkbox => {
                     checkbox.addEventListener('change', () => {
                         if (checkbox.checked) {
-                            // Uncheck other checkboxes in the same question
                             checkboxes.forEach(cb => {
                                 if (cb !== checkbox) {
                                     cb.checked = false;
                                     cb.parentElement.classList.remove('correct', 'incorrect');
                                 }
                             });
-                            // Disable other checkboxes and apply styling
                             checkboxes.forEach(cb => {
                                 cb.disabled = true;
                                 const label = cb.parentElement;
@@ -322,7 +434,6 @@
                             });
                             updateUnansweredQuestions();
                         } else {
-                            // Re-enable all checkboxes if unchecked
                             checkboxes.forEach(cb => {
                                 cb.disabled = false;
                                 cb.parentElement.classList.remove('correct', 'incorrect');
@@ -334,7 +445,7 @@
             });
         }
 
-        // Handle photo upload and preview
+        // Handle photo upload
         document.getElementById('photo').addEventListener('change', function(e) {
             const file = e.target.files[0];
             const errorMsg = document.getElementById('errorMsg');
@@ -379,6 +490,7 @@
                 errorMsg.textContent = 'Error reading photo. Please try another image.';
                 errorMsg.style.display = 'block';
                 this.value = '';
+                return;
             };
             reader.readAsDataURL(file);
         });
@@ -411,15 +523,42 @@
             }
         }
 
-        // Check submission lockout
-        function canSubmit() {
-            const admNo = document.getElementById('admNo').value.trim();
-            if (!admNo) return true;
-            const lastSubmission = localStorage.getItem(`lastSubmission_${admNo}_part1`);
-            if (!lastSubmission) return true;
-            const now = Date.now();
-            const tenMinutes = 10 * 60 * 1000;
-            return now - parseInt(lastSubmission) > tenMinutes;
+        // Check if submission is allowed
+        async function canSubmit(admNo, ipAddress) {
+            const errorMsg = document.getElementById('errorMsg');
+            if (!admNo || !ipAddress) return false;
+
+            // Check for previous submission
+            const submissionKey = `submission_${admNo}_part1`;
+            const submissionData = localStorage.getItem(submissionKey);
+            if (submissionData) {
+                const { ip } = JSON.parse(submissionData);
+                if (ip === ipAddress) {
+                    errorMsg.textContent = 'You have already submitted this quiz.';
+                    errorMsg.style.display = 'block';
+                    return false;
+                }
+            }
+
+            // Check for IP lockout
+            const lockoutKey = `lockout_${ipAddress}_part1`;
+            const lockoutData = localStorage.getItem(lockoutKey);
+            if (lockoutData) {
+                const { timestamp } = JSON.parse(lockoutData);
+                const now = Date.now();
+                const twentyFourHours = 24 * 60 * 60 * 1000;
+                if (now - timestamp < twentyFourHours) {
+                    const remainingMs = twentyFourHours - (now - timestamp);
+                    const remainingHours = Math.ceil(remainingMs / (60 * 60 * 1000));
+                    errorMsg.textContent = `Your IP is locked out. Try again in ${remainingHours} hour(s).`;
+                    errorMsg.style.display = 'block';
+                    return false;
+                } else {
+                    localStorage.removeItem(lockoutKey); // Clear expired lockout
+                }
+            }
+
+            return true;
         }
 
         // Start the quiz
@@ -433,6 +572,7 @@
             const errorMsg = document.getElementById('errorMsg');
             const preview = document.getElementById('photoPreview');
 
+            // Validate inputs
             if (!surname || !firstName || !photo || !admNo || !form || !stream) {
                 errorMsg.textContent = 'Please fill all required fields and upload a photo.';
                 errorMsg.style.display = 'block';
@@ -443,7 +583,6 @@
                 errorMsg.style.display = 'block';
                 return;
             }
-
             const validTypes = ['image/jpeg', 'image/png'];
             if (!validTypes.includes(photo.type)) {
                 errorMsg.textContent = 'Please upload a JPG or PNG image.';
@@ -460,33 +599,34 @@
                 errorMsg.style.display = 'block';
                 return;
             }
-
-            if (!canSubmit()) {
-                errorMsg.textContent = 'You must wait 10 minutes before retaking the quiz.';
+            if (questions.length === 0) {
+                errorMsg.textContent = 'No questions available. Please add questions.';
                 errorMsg.style.display = 'block';
                 return;
             }
 
-            // Load questions before starting the quiz
-            const questionsLoaded = await loadQuestions();
-            if (!questionsLoaded || questions.length === 0) {
-                errorMsg.textContent = 'No questions loaded. Please check questions.txt.';
-                errorMsg.style.display = 'block';
+            // Fetch IP and check submission
+            quizData.ipAddress = await getIPAddress();
+            if (!(await canSubmit(admNo, quizData.ipAddress))) {
                 return;
             }
 
             quizData.studentInfo = { surname, firstName, otherName: document.getElementById('otherName').value.trim(), admNo, form, stream };
+            timeLeft = questions.length * 30; // 30 seconds per question
 
             errorMsg.style.display = 'none';
             document.getElementById('quizContainer').style.display = 'block';
             document.getElementById('timer').style.display = 'block';
             document.getElementById('startBtn').disabled = true;
 
+            renderQuestions();
+
+            const timerDisplay = document.getElementById('timer');
             timerInterval = setInterval(() => {
                 timeLeft--;
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
-                document.getElementById('timer').textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                timerDisplay.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     submitQuiz(true);
@@ -495,10 +635,11 @@
         }
 
         // Handle quiz submission
-        function submitQuiz(isAutoSubmit = false) {
+        async function submitQuiz(isAutoSubmit = false) {
             const errorMsg = document.getElementById('errorMsg');
             const submitBtn = document.getElementById('submitBtn');
             const scoreDiv = document.getElementById('score');
+            const printBtn = document.getElementById('printBtn');
             const emailBtn = document.getElementById('emailBtn');
 
             updateUnansweredQuestions();
@@ -508,34 +649,56 @@
                 quizData.answers = [];
                 questions.forEach((q, i) => {
                     const question = document.querySelector(`.question:nth-child(${i + 1})`);
-                    const questionText = question.queryStaffElement('p').textContent;
+                    const questionText = question.querySelector('p').textContent;
                     const checked = document.querySelector(`input[name="q${q.index}"]:checked`);
                     const options = Object.values(q.options);
                     let selectedAnswer = checked ? checked.parentElement.textContent : 'Not answered';
                     let isCorrect = checked && checked.dataset.correct === 'true';
                     if (isCorrect) score++;
+
+                    const correctCheckbox = document.querySelector(`input[name="q${q.index}"][value="${q.correct}"]`);
+                    if (correctCheckbox) {
+                        correctCheckbox.parentElement.classList.add('correct');
+                    }
+                    if (checked && !isCorrect) {
+                        checked.parentElement.classList.add('incorrect');
+                    }
+
                     quizData.answers.push({ questionText, options, selectedAnswer, isCorrect });
                 });
 
                 quizData.score = `${score}/${questions.length} (${((score / questions.length) * 100).toFixed(2)}%)`;
-
                 scoreDiv.textContent = `Your Score: ${quizData.score}`;
                 scoreDiv.style.display = 'block';
 
                 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = true);
                 submitBtn.disabled = true;
+                printBtn.style.display = 'inline-block';
                 emailBtn.style.display = 'inline-block';
                 clearInterval(timerInterval);
                 document.getElementById('timer').style.display = 'none';
 
-                const admNo = document.getElementById('admNo').value.trim();
-                if (admNo) {
-                    localStorage.setItem(`lastSubmission_${admNo}_part1`, Date.now());
+                const admNo = quizData.studentInfo.admNo;
+                if (admNo && quizData.ipAddress) {
+                    // Store submission
+                    const submissionKey = `submission_${admNo}_part1`;
+                    localStorage.setItem(submissionKey, JSON.stringify({
+                        ip: quizData.ipAddress,
+                        timestamp: Date.now()
+                    }));
+
+                    // Store IP lockout if timer expired
+                    if (isAutoSubmit) {
+                        const lockoutKey = `lockout_${quizData.ipAddress}_part1`;
+                        localStorage.setItem(lockoutKey, JSON.stringify({
+                            timestamp: Date.now()
+                        }));
+                    }
                 }
             }
         }
 
-        // Send email
+        // Send email with PDF
         function sendEmail() {
             const errorMsg = document.getElementById('errorMsg');
             if (!quizData.studentInfo || !quizData.answers || !quizData.score) {
@@ -544,9 +707,26 @@
                 return;
             }
 
+            const element = document.getElementById('pdfContent');
+            const opt = {
+                margin: 10,
+                filename: `Quiz_${quizData.studentInfo?.surname || 'Student'}_${quizData.studentInfo?.firstName || 'Unknown'}_${quizData.studentInfo?.admNo || 'NoAdmNo'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().catch(err => {
+                console.error('Error generating PDF:', err);
+                errorMsg.textContent = 'Error generating PDF. Please try again.';
+                errorMsg.style.display = 'block';
+                return;
+            });
+
             let htmlContent = `
                 <div class="email-content" style="font-family: Arial, sans-serif; color: #333;">
                     <h1 style="color: #2c3e50; text-align: center;">Support and Movement in Plants and Animals Quiz (Form 4, Part 1)</h1>
+                    <p>Please attach the downloaded PDF (${opt.filename}) to this email.</p>
                     <h2 style="color: #34495e;">Student Information</h2>
                     <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
                         <tr><th style="border: 1px solid #ccc; padding: 8px; background: #f5f6fa;">Field</th><th style="border: 1px solid #ccc; padding: 8px; background: #f5f6fa;">Details</th></tr>
