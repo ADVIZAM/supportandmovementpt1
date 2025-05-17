@@ -1,12 +1,7 @@
 [
   {
-    "question": "Which of the following is not a function of the skeleton?",
-    "choices": ["Support", "Protection", "Circulation", "Movement"],
-    "answer": "Circulation"
-  },
-  {
-    "question": "What type of joint is found at the elbow?",
-    "choices": ["Ball and socket", "Hinge", "Pivot", "Gliding"],
-    "answer": "Hinge"
+    "question": "Which bones form the axial skeleton?",
+    "choices": ["Skull and vertebral column", "Femur and humerus", "Radius and ulna", "Pelvis and scapula"],
+    "answer": "Skull and vertebral column"
   }
 ]
